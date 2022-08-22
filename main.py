@@ -8,7 +8,6 @@ from sklearn.decomposition import TruncatedSVD
 
 from utils import *
 
-
 dataset_path = 'data/multiome_BMMC_processed/'
 
 param = {
@@ -26,13 +25,21 @@ mod1 = train_mod1.var['feature_types'][0]
 dataset_id = train_mod1.uns['dataset_id']
 input_train_mod1 = train_mod1.X
 
-# train_mod2 = sc.read_h5ad(param['input_train_mod2'])
-# var = train_mod2.var
-# mod2 = train_mod2.var['feature_types'][0]
-# input_train_mod2 = train_mod2.X
+train_mod2 = sc.read_h5ad(param['input_train_mod2'])
+var = train_mod2.var
+mod2 = train_mod2.var['feature_types'][0]
+input_train_mod2 = train_mod2.X
 
-input_train_mod1 = embedding(input_train_mod1, param['n_components_mod1'], random_seed=param['random_seed'])
-# input_train_mod2 = embedding(input_train_mod2, param['n_components_mod1'], random_seed=param['random_seed'])
+mod1_train, mod1_test, mod2_train, mod2_test = train_test_split(input_train_mod1, input_train_mod2, test_size=0.1,
+                                                                random_state=param['random_seed'])
 
-# mod1_train, mod1_test, mod2_train, mod2_test = train_test_split(input_train_mod1, input_train_mod2)
+mod1_train, mod1_reducer = embedding(mod1_train, param['n_components_mod1'], random_seed=param['random_seed'])
+mod2_train, mod2_reducer = embedding(mod2_train, param['n_components_mod1'], random_seed=param['random_seed'])
 
+mod1_test = mod1_reducer.transform(mod1_test)
+mod2_test = mod2_reducer.transform(mod2_test)
+
+mod1_train.write(f'{dataset_path}mod1_train_svd.h5ad')
+mod1_test.write(f'{dataset_path}mod1_test_svd.h5ad')
+mod2_train.write(f'{dataset_path}mod1_svd.h5ad')
+mod2_test.write(f'{dataset_path}mod1_svd.h5ad')

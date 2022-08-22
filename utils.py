@@ -10,5 +10,5 @@ def embedding(mod, n_components, random_seed=0):
     mod_reducer = TruncatedSVD(n_components=n_components, random_state=random_seed)
     truncated_mod = mod_reducer.transform(mod)
     del mod
-    return truncated_mod
+    return truncated_mod, mod_reducer
 
