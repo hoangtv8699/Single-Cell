@@ -2,7 +2,7 @@ import pandas as pd
 import scanpy as sc
 import anndata as ad
 import logging
-
+import pickle as pk
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import TruncatedSVD
 
@@ -16,7 +16,7 @@ param = {
     'n_components_mod1': 100,
     'n_components_mod2': 100,
     'random_seed': 17,
-    'output': 'output.h5ad'
+    'output_pretrain': 'pretrain'
 }
 
 logging.info('Reading `h5ad` files...')
@@ -43,3 +43,7 @@ mod1_train.write(f'{dataset_path}mod1_train_svd.h5ad')
 mod1_test.write(f'{dataset_path}mod1_test_svd.h5ad')
 mod2_train.write(f'{dataset_path}mod1_svd.h5ad')
 mod2_test.write(f'{dataset_path}mod1_svd.h5ad')
+pk.dump(mod1_reducer, open(os.path.join(par['output_pretrain'], "svd_mod1.pkl"), "wb"))
+pk.dump(mod1_reducer, open(os.path.join(par['output_pretrain'], "svd_mod2.pkl"), "wb"))
+
+
