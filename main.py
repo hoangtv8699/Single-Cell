@@ -39,11 +39,11 @@ mod2_train, mod2_reducer = embedding(mod2_train, param['n_components_mod1'], ran
 mod1_test = mod1_reducer.transform(mod1_test)
 mod2_test = mod2_reducer.transform(mod2_test)
 
-mod1_train.write(f'{dataset_path}mod1_train_svd.h5ad')
-mod1_test.write(f'{dataset_path}mod1_test_svd.h5ad')
-mod2_train.write(f'{dataset_path}mod1_svd.h5ad')
-mod2_test.write(f'{dataset_path}mod1_svd.h5ad')
-pk.dump(mod1_reducer, open(os.path.join(par['output_pretrain'], "svd_mod1.pkl"), "wb"))
-pk.dump(mod1_reducer, open(os.path.join(par['output_pretrain'], "svd_mod2.pkl"), "wb"))
+pk.dump(mod1_train, open("mod1_train_svd.h5ad", "wb"))
+pk.dump(mod1_test, open("mod1_test_svd.h5ad", "wb"))
+pk.dump(mod2_train, open("mod2_train_svd.h5ad", "wb"))
+pk.dump(mod2_test, open("mod2_test_svd.h5ad", "wb"))
+pk.dump(mod1_reducer, open("svd_mod1.pkl", "wb"))
+pk.dump(mod1_reducer, open("svd_mod2.pkl", "wb"))
 
 
