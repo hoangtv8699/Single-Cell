@@ -1,0 +1,341 @@
+Namespace(activation='relu', epochs=1000, hid_feats=100, k=10, latent_feats=20, lr1=0.01, lr2=0.01, mod1_feat_size=100, mod2_feat_size=100, normalization='batch', num_decoder_layer=7, num_encoder_layer=7, num_gcn1_layer=7, num_gcn2_layer=7, num_mod1_layer=7, num_mod2_layer=7, out_mod1_feats=100, out_mod2_feats=100, patience=2)
+JointGCNAutoEncoder(
+  (gcn1): GCNlayer(
+    (gcn): ModuleList(
+      (0): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (1): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (2): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (3): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (4): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (5): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (6): GraphConv(in=100, out=100, normalization=both, activation=None)
+    )
+    (gcn_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+    )
+    (gcn_norm): ModuleList()
+  )
+  (gcn2): GCNlayer(
+    (gcn): ModuleList(
+      (0): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (1): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (2): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (3): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (4): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (5): GraphConv(in=100, out=100, normalization=both, activation=None)
+      (6): GraphConv(in=100, out=100, normalization=both, activation=None)
+    )
+    (gcn_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+    )
+    (gcn_norm): ModuleList()
+  )
+  (hid_encoder): HiddenEncoder(
+    (hid_encoder): ModuleList(
+      (0): Linear(in_features=100, out_features=100, bias=True)
+      (1): Linear(in_features=100, out_features=100, bias=True)
+      (2): Linear(in_features=100, out_features=100, bias=True)
+      (3): Linear(in_features=100, out_features=100, bias=True)
+      (4): Linear(in_features=100, out_features=100, bias=True)
+      (5): Linear(in_features=100, out_features=100, bias=True)
+      (6): Linear(in_features=100, out_features=20, bias=True)
+    )
+    (encoder_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+    )
+    (encoder_norm): ModuleList(
+      (0): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (5): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): BatchNorm1d(20, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (hid_decoder): HiddenDecoder(
+    (hid_decoder): ModuleList(
+      (0): Linear(in_features=20, out_features=100, bias=True)
+      (1): Linear(in_features=100, out_features=100, bias=True)
+      (2): Linear(in_features=100, out_features=100, bias=True)
+      (3): Linear(in_features=100, out_features=100, bias=True)
+      (4): Linear(in_features=100, out_features=100, bias=True)
+      (5): Linear(in_features=100, out_features=100, bias=True)
+      (6): Linear(in_features=100, out_features=100, bias=True)
+    )
+    (decoder_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+    )
+    (decoder_norm): ModuleList(
+      (0): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (5): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (mod1_decoder): ModalityDecoder(
+    (mod_decoder): ModuleList(
+      (0): Linear(in_features=100, out_features=100, bias=True)
+      (1): Linear(in_features=100, out_features=100, bias=True)
+      (2): Linear(in_features=100, out_features=100, bias=True)
+      (3): Linear(in_features=100, out_features=100, bias=True)
+      (4): Linear(in_features=100, out_features=100, bias=True)
+      (5): Linear(in_features=100, out_features=100, bias=True)
+      (6): Linear(in_features=100, out_features=100, bias=True)
+    )
+    (mod_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+    )
+    (mod_norm): ModuleList(
+      (0): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (5): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (mod2_decoder): ModalityDecoder(
+    (mod_decoder): ModuleList(
+      (0): Linear(in_features=100, out_features=100, bias=True)
+      (1): Linear(in_features=100, out_features=100, bias=True)
+      (2): Linear(in_features=100, out_features=100, bias=True)
+      (3): Linear(in_features=100, out_features=100, bias=True)
+      (4): Linear(in_features=100, out_features=100, bias=True)
+      (5): Linear(in_features=100, out_features=100, bias=True)
+      (6): Linear(in_features=100, out_features=100, bias=True)
+    )
+    (mod_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+    )
+    (mod_norm): ModuleList(
+      (0): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (5): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): BatchNorm1d(100, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+)
+epoch:  0
+training loss 1:  1.5853042602539062
+training loss 2:  39968296.0
+validation loss 1:  1.4449506998062134
+validation loss 2:  39757140.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  1
+training loss 1:  1.4168415069580078
+training loss 2:  39966984.0
+validation loss 1:  1.4018722772598267
+validation loss 2:  39933652.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  2
+training loss 1:  1.2506489753723145
+training loss 2:  39964628.0
+validation loss 1:  1.3165218830108643
+validation loss 2:  39935700.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  3
+training loss 1:  1.0822250843048096
+training loss 2:  39963416.0
+validation loss 1:  1.1299762725830078
+validation loss 2:  39721832.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  4
+training loss 1:  0.9353620409965515
+training loss 2:  39962244.0
+validation loss 1:  0.9406104683876038
+validation loss 2:  39554964.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  5
+training loss 1:  0.8335849642753601
+training loss 2:  39961204.0
+validation loss 1:  0.8051944971084595
+validation loss 2:  39474428.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  6
+training loss 1:  0.7687907814979553
+training loss 2:  39960124.0
+validation loss 1:  0.7037776112556458
+validation loss 2:  39427660.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  7
+training loss 1:  0.727253794670105
+training loss 2:  39959020.0
+validation loss 1:  0.6026179790496826
+validation loss 2:  39752044.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  8
+training loss 1:  0.6917582750320435
+training loss 2:  39957856.0
+validation loss 1:  0.5479629039764404
+validation loss 2:  39462672.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  9
+training loss 1:  0.6595306992530823
+training loss 2:  39956620.0
+validation loss 1:  0.5339046716690063
+validation loss 2:  39378260.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  10
+training loss 1:  0.6166262030601501
+training loss 2:  39955140.0
+validation loss 1:  0.5341904163360596
+validation loss 2:  39299796.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  11
+training loss 1:  0.5803702473640442
+training loss 2:  39953700.0
+validation loss 1:  0.5888897180557251
+validation loss 2:  39341560.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  12
+training loss 1:  0.5677535533905029
+training loss 2:  39952052.0
+validation loss 1:  0.6663072109222412
+validation loss 2:  39399868.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  13
+training loss 1:  0.5336180925369263
+training loss 2:  39950432.0
+validation loss 1:  0.6778454184532166
+validation loss 2:  39435412.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  14
+training loss 1:  0.5101737380027771
+training loss 2:  39948820.0
+validation loss 1:  0.7898987531661987
+validation loss 2:  39953116.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  15
+training loss 1:  0.4843458831310272
+training loss 2:  39947064.0
+validation loss 1:  0.9775506258010864
+validation loss 2:  39775264.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  16
+training loss 1:  0.46385443210601807
+training loss 2:  39945676.0
+validation loss 1:  1.0045019388198853
+validation loss 2:  39534328.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  17
+training loss 1:  0.5114375352859497
+training loss 2:  39943912.0
+validation loss 1:  1.072461724281311
+validation loss 2:  39650104.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  18
+training loss 1:  0.4440072178840637
+training loss 2:  39941784.0
+validation loss 1:  1.0120515823364258
+validation loss 2:  39698600.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  19
+training loss 1:  0.4767147898674011
+training loss 2:  39939892.0
+validation loss 1:  1.0163565874099731
+validation loss 2:  39731204.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  20
+training loss 1:  0.449627161026001
+training loss 2:  39938272.0
+validation loss 1:  1.038968801498413
+validation loss 2:  39766396.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  21
+training loss 1:  0.43568724393844604
+training loss 2:  39936196.0
+validation loss 1:  1.066191554069519
+validation loss 2:  39942296.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  22
+training loss 1:  0.4238625764846802
+training loss 2:  39934304.0
+validation loss 1:  1.0626001358032227
+validation loss 2:  39843192.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  23
+training loss 1:  0.40638822317123413
+training loss 2:  39933960.0
+validation loss 1:  1.2422668933868408
+validation loss 2:  39589640.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  24
+training loss 1:  0.3944721519947052
+training loss 2:  39931948.0
+validation loss 1:  1.3600194454193115
+validation loss 2:  39767788.0
+rmse ADT to GEX:  7.147247314453125
+rmse GEX to ADT:  4740.69970703125
+epoch:  25
+training loss 1:  0.38477036356925964
+training loss 2:  39929096.0
+validation loss 1:  1.4564476013183594
+validation loss 2:  39777828.0
