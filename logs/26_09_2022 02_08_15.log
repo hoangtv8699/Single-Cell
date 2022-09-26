@@ -1,0 +1,139 @@
+class name: ['B1 B' 'CD14+ Mono' 'CD16+ Mono' 'CD4+ T activated' 'CD4+ T naive'
+ 'CD8+ T' 'CD8+ T naive' 'Erythroblast' 'G/M prog' 'HSC'
+ 'ID2-hi myeloid prog' 'ILC' 'Lymph prog' 'MK/E prog' 'NK' 'Naive CD20+ B'
+ 'Normoblast' 'Plasma cell' 'Proerythroblast' 'Transitional B' 'cDC2'
+ 'pDC']
+args1: Namespace(act_out='sigmoid', activation='relu', class_hid_feats=512, classes_=array(['B1 B', 'CD14+ Mono', 'CD16+ Mono', 'CD4+ T activated',
+       'CD4+ T naive', 'CD8+ T', 'CD8+ T naive', 'Erythroblast',
+       'G/M prog', 'HSC', 'ID2-hi myeloid prog', 'ILC', 'Lymph prog',
+       'MK/E prog', 'NK', 'Naive CD20+ B', 'Normoblast', 'Plasma cell',
+       'Proerythroblast', 'Transitional B', 'cDC2', 'pDC'], dtype=object), dropout=0.2, embed_hid_feats=512, epochs=1000, input_feats=13431, latent_feats=32, lr_classification=0.0001, lr_embed=0.0001, lr_predict=0.001, normalization='batch', num_class=22, num_class_layer=4, num_embed_layer=4, num_pred_layer=4, out_feats=116490, patience=10, pred_hid_feats=512, random_seed=17)
+args2: Namespace(act_out='relu', activation='relu', class_hid_feats=1024, classes_=array(['B1 B', 'CD14+ Mono', 'CD16+ Mono', 'CD4+ T activated',
+       'CD4+ T naive', 'CD8+ T', 'CD8+ T naive', 'Erythroblast',
+       'G/M prog', 'HSC', 'ID2-hi myeloid prog', 'ILC', 'Lymph prog',
+       'MK/E prog', 'NK', 'Naive CD20+ B', 'Normoblast', 'Plasma cell',
+       'Proerythroblast', 'Transitional B', 'cDC2', 'pDC'], dtype=object), dropout=0.2, embed_hid_feats=1024, epochs=1000, input_feats=116490, latent_feats=32, lr_classification=0.0001, lr_embed=0.0001, lr_predict=0.001, normalization='batch', num_class=22, num_class_layer=4, num_embed_layer=4, num_pred_layer=4, out_feats=13431, patience=10, pred_hid_feats=1024, random_seed=17)
+net1: ContrastiveModel(
+  (embed): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=13431, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=32, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (classification): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=32, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=22, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): Softmax(dim=1)
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (predict): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=32, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=116490, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): Sigmoid()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+)
+net2: ContrastiveModel(
+  (embed): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=116490, out_features=1024, bias=True)
+      (1): Linear(in_features=1024, out_features=1024, bias=True)
+      (2): Linear(in_features=1024, out_features=1024, bias=True)
+      (3): Linear(in_features=1024, out_features=32, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (classification): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=32, out_features=1024, bias=True)
+      (1): Linear(in_features=1024, out_features=1024, bias=True)
+      (2): Linear(in_features=1024, out_features=1024, bias=True)
+      (3): Linear(in_features=1024, out_features=22, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): Softmax(dim=1)
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (predict): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=32, out_features=1024, bias=True)
+      (1): Linear(in_features=1024, out_features=1024, bias=True)
+      (2): Linear(in_features=1024, out_features=1024, bias=True)
+      (3): Linear(in_features=1024, out_features=13431, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+)
