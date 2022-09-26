@@ -60,10 +60,10 @@ args1 = Namespace(
 args2 = Namespace(
     input_feats=256,
     num_class=22,
-    embed_hid_feats=2048,
-    latent_feats=512,
-    class_hid_feats=2048,
-    pred_hid_feats=2048,
+    embed_hid_feats=1024,
+    latent_feats=1024,
+    class_hid_feats=1024,
+    pred_hid_feats=1024,
     out_feats=13431,
     random_seed=17,
     activation='relu',
@@ -168,7 +168,7 @@ net2 = ContrastiveModel(args2)
 logger.write('net1: ' + str(net1) + '\n')
 logger.write('net2: ' + str(net2) + '\n')
 
-params = {'batch_size': 512,
+params = {'batch_size': 256,
           'shuffle': True,
           'num_workers': 0}
 

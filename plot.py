@@ -9,7 +9,6 @@ from utils import *
 
 import os
 import time
-import dgl
 import torch
 import pandas as pd
 import scanpy as sc
@@ -89,14 +88,8 @@ args2 = Namespace(
     patience=10
 )
 
-now = datetime.now()
-time_train = now.strftime("%d_%m_%Y %H_%M_%S")
-# time_train = '26_09_2022 02_08_15'
-logger = open(f'{param["logs_path"]}{time_train}.log', 'w')
-os.mkdir(f'{param["save_model_path"]}{time_train}')
 
 # get feature type
-logging.info('Reading `h5ad` files...')
 train_mod1 = sc.read_h5ad(param['input_train_mod1'])
 train_mod2 = sc.read_h5ad(param['input_train_mod2'])
 mod1 = train_mod1.var['feature_types'][0]
@@ -106,15 +99,14 @@ mod2 = train_mod2.var['feature_types'][0]
 LE = LabelEncoder()
 train_mod1.obs["class_label"] = LE.fit_transform(train_mod1.obs["cell_type"])
 input_label = train_mod1.obs["class_label"].to_numpy()
-logger.write('class name: ' + str(LE.classes_) + '\n')
 
-train_name, val_name, _, _ = train_test_split(train_mod1.obs_names, input_label,
+mod1_train, _, mod2_train, _, label_train, label_val = train_test_split(train_mod1.X, train_mod2.X , input_label,
                                         test_size=0.1,
                                         random_state=args1.random_seed,
                                         stratify=input_label)
 
-mod1_train = train_mod1[train_name, :]
-mod2_train = train_mod2[train_name, :]
+mod1_train = sc.AnnData(mod1_train, dtype=mod1_train.dtype)
+mod2_train = sc.AnnData(mod2_train, dtype=mod2_train.dtype)
 
 mod2_train, mod2_reducer = embedding(mod2_train, args2.input_feats, random_seed=args2.random_seed)
 mod1_train, mod1_reducer = embedding(mod1_train, args1.input_feats, random_seed=args1.random_seed)
