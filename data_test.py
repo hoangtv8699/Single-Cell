@@ -12,9 +12,9 @@ train = sc.read_h5ad(train_path)
 
 pretrain_path = 'pretrain/'
 
-print(raw)
-print(processed.layers['counts'][1000])
-print(train.layers['counts'][1000])
+print(train.X[0])
+sc.pp.log1p(train)
+print(train.X[0])
 
 
 

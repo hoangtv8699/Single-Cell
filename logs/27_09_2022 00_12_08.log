@@ -1,0 +1,198 @@
+class name: ['B1 B' 'CD14+ Mono' 'CD16+ Mono' 'CD4+ T activated' 'CD4+ T naive'
+ 'CD8+ T' 'CD8+ T naive' 'Erythroblast' 'G/M prog' 'HSC'
+ 'ID2-hi myeloid prog' 'ILC' 'Lymph prog' 'MK/E prog' 'NK' 'Naive CD20+ B'
+ 'Normoblast' 'Plasma cell' 'Proerythroblast' 'Transitional B' 'cDC2'
+ 'pDC']
+args1: Namespace(act_out='sigmoid', activation='relu', class_hid_feats=512, classes_=array(['B1 B', 'CD14+ Mono', 'CD16+ Mono', 'CD4+ T activated',
+       'CD4+ T naive', 'CD8+ T', 'CD8+ T naive', 'Erythroblast',
+       'G/M prog', 'HSC', 'ID2-hi myeloid prog', 'ILC', 'Lymph prog',
+       'MK/E prog', 'NK', 'Naive CD20+ B', 'Normoblast', 'Plasma cell',
+       'Proerythroblast', 'Transitional B', 'cDC2', 'pDC'], dtype=object), dropout=0.2, embed_hid_feats=512, epochs=1000, input_feats=256, latent_feats=64, lr_classification=0.0001, lr_embed=0.0001, lr_predict=0.0001, normalization='batch', num_class=22, num_class_layer=4, num_embed_layer=8, num_pred_layer=4, out_feats=256, patience=10, pred_hid_feats=512, random_seed=17)
+args2: Namespace(act_out='relu', activation='relu', class_hid_feats=512, classes_=array(['B1 B', 'CD14+ Mono', 'CD16+ Mono', 'CD4+ T activated',
+       'CD4+ T naive', 'CD8+ T', 'CD8+ T naive', 'Erythroblast',
+       'G/M prog', 'HSC', 'ID2-hi myeloid prog', 'ILC', 'Lymph prog',
+       'MK/E prog', 'NK', 'Naive CD20+ B', 'Normoblast', 'Plasma cell',
+       'Proerythroblast', 'Transitional B', 'cDC2', 'pDC'], dtype=object), dropout=0.2, embed_hid_feats=512, epochs=1000, input_feats=256, latent_feats=64, lr_classification=0.0001, lr_embed=0.0001, lr_predict=0.0001, normalization='batch', num_class=22, num_class_layer=4, num_embed_layer=8, num_pred_layer=4, out_feats=256, patience=10, pred_hid_feats=512, random_seed=17)
+net1: ContrastiveModel(
+  (embed): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=256, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=512, bias=True)
+      (4): Linear(in_features=512, out_features=512, bias=True)
+      (5): Linear(in_features=512, out_features=512, bias=True)
+      (6): Linear(in_features=512, out_features=512, bias=True)
+      (7): Linear(in_features=512, out_features=64, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+      (7): ReLU()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (5): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (classification): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=64, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=22, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): Softmax(dim=1)
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (predict): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=64, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=256, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): Sigmoid()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+)
+net2: ContrastiveModel(
+  (embed): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=256, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=512, bias=True)
+      (4): Linear(in_features=512, out_features=512, bias=True)
+      (5): Linear(in_features=512, out_features=512, bias=True)
+      (6): Linear(in_features=512, out_features=512, bias=True)
+      (7): Linear(in_features=512, out_features=64, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+      (7): ReLU()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (5): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (classification): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=64, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=22, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): Softmax(dim=1)
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (predict): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=64, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=256, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+)
+epoch:  0
+training loss: 2.6853280411212492
+validation loss: 2.444245149612427
+validation acc: 0.7423529411764705
+classification report: 
+                     precision    recall  f1-score   support
+
+               B1 B       1.00      0.00      0.00        96
+         CD14+ Mono       0.81      0.99      0.89       830
+         CD16+ Mono       0.91      0.91      0.91       122
+   CD4+ T activated       0.67      0.67      0.67       394
+       CD4+ T naive       0.61      0.69      0.64       350
+             CD8+ T       0.77      0.90      0.83       563
+       CD8+ T naive       1.00      0.00      0.00        55
+       Erythroblast       0.74      0.98      0.84       382
+           G/M prog       1.00      0.00      0.00        59
+                HSC       0.00      0.00      0.00        55
+ID2-hi myeloid prog       1.00      0.00      0.00        11
+                ILC       1.00      0.00      0.00        75
+         Lymph prog       0.50      0.07      0.12        72
+          MK/E prog       1.00      0.00      0.00        40
+                 NK       0.79      0.96      0.87       458
+      Naive CD20+ B       0.55      0.97      0.70       237
+         Normoblast       0.96      0.92      0.94       148
+        Plasma cell       1.00      0.00      0.00        19
+    Proerythroblast       0.67      0.04      0.08        92
+     Transitional B       1.00      0.00      0.00        71
+               cDC2       1.00      0.00      0.00        51
+                pDC       0.95      0.26      0.40        70
+
+           accuracy                           0.74      4250
+          macro avg       0.81      0.38      0.36      4250
+       weighted avg       0.76      0.74      0.68      4250
+
+epoch:  1

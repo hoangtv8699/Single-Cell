@@ -67,7 +67,7 @@ def embedding(mod, n_components, random_seed=0):
     # sc.pp.scale(mod)
 
     mod_reducer = TruncatedSVD(n_components=n_components, random_state=random_seed)
-    truncated_mod = mod_reducer.fit_transform(mod.X)
+    truncated_mod = mod_reducer.fit_transform(mod)
     del mod
     return truncated_mod, mod_reducer
 
@@ -714,11 +714,11 @@ def train_contrastive(train_loader, val_loader, net1, net2, args1, logger):
 
 
 # train model to predict modality
-def train_predict(train_loader, val_loader, net, args, logger):
+def train_predict(train_loader, val_loader, net, args, logger, mod_reducer):
     print('train predict')
     net.cuda()
-    net_param = []
-    net_param.extend(net.predict.parameters())
+    # net_param = []
+    # net_param.extend(net.predict.parameters())
     opt = torch.optim.Adam(net.parameters(), args.lr_predict)
 
     training_loss = []
@@ -760,8 +760,13 @@ def train_predict(train_loader, val_loader, net, args, logger):
                 out = net(val_batch, residual=True, types='predict')
                 loss = criterion(out, label)
                 running_loss += loss.item() * val_batch.size(0)
-                running_rmse += mean_squared_error(label.detach().cpu().numpy(),
-                                                   out.detach().cpu().numpy()) * val_batch.size(0)
+                # using reducer
+                out_ori = mod_reducer.inverse_transform(out.detach().cpu().numpy())
+                label_ori = mod_reducer.inverse_transform(label.detach().cpu().numpy())
+                running_rmse += mean_squared_error(label_ori, out_ori) * val_batch.size(0)
+                # not using reducer
+                # running_rmse += mean_squared_error(label.detach().cpu().numpy(),
+                #                                        out.detach().cpu().numpy()) * val_batch.size(0)
 
             val_loss.append(running_loss / len(val_loader.dataset))
             rmse.append(math.sqrt(running_rmse / len(val_loader.dataset)))
@@ -940,3 +945,14 @@ def drop_data(adata):
     del adata.obsm
     del adata.layers
     return adata
+
+
+class LinearRegressionModel(torch.nn.Module):
+
+    def __init__(self, int, out):
+        super(LinearRegressionModel, self).__init__()
+        self.linear = torch.nn.Linear(int, out)  # One in and one out
+
+    def forward(self, x):
+        y_pred = self.linear(x)
+        return y_pred

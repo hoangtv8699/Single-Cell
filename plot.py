@@ -24,9 +24,16 @@ from torch.utils.data import DataLoader
 
 from datetime import datetime
 
-from utils import *
 
-device = torch.device("cuda:0")
+def embedding(mod, n_components, random_seed=0):
+    # sc.pp.log1p(mod)
+    # sc.pp.scale(mod)
+
+    mod_reducer = TruncatedSVD(n_components=n_components, random_state=random_seed)
+    truncated_mod = mod_reducer.fit_transform(mod)
+    del mod
+    return truncated_mod, mod_reducer
+
 
 dataset_path = 'data/train/multiome/'
 pretrain_path = 'pretrain/'
@@ -88,31 +95,26 @@ args2 = Namespace(
     patience=10
 )
 
-
 # get feature type
 train_mod1 = sc.read_h5ad(param['input_train_mod1'])
 train_mod2 = sc.read_h5ad(param['input_train_mod2'])
 mod1 = train_mod1.var['feature_types'][0]
 mod2 = train_mod2.var['feature_types'][0]
 
+# log norm train mod1
+sc.pp.log1p(train_mod1)
+
 # get input and encode label for classification training
 LE = LabelEncoder()
 train_mod1.obs["class_label"] = LE.fit_transform(train_mod1.obs["cell_type"])
 input_label = train_mod1.obs["class_label"].to_numpy()
 
-mod1_train, _, mod2_train, _, label_train, label_val = train_test_split(train_mod1.X, train_mod2.X , input_label,
-                                        test_size=0.1,
-                                        random_state=args1.random_seed,
-                                        stratify=input_label)
+mod1_train, _, mod2_train, _, label_train, label_val = train_test_split(train_mod1.X, train_mod2.X, input_label,
+                                                                        test_size=0.1,
+                                                                        random_state=args1.random_seed,
+                                                                        stratify=input_label)
 
-mod1_train = sc.AnnData(mod1_train, dtype=mod1_train.dtype)
-mod2_train = sc.AnnData(mod2_train, dtype=mod2_train.dtype)
-
-mod2_train, mod2_reducer = embedding(mod2_train, args2.input_feats, random_seed=args2.random_seed)
 mod1_train, mod1_reducer = embedding(mod1_train, args1.input_feats, random_seed=args1.random_seed)
-
-print(mod1_train)
-print(mod2_train)
-
-pk.dump(mod1_reducer, open(f'pretrain/{mod1} reducer', "wb"))
-pk.dump(mod2_reducer, open(f'pretrain/{mod2} reducer', "wb"))
+pk.dump(mod1_reducer, open(f'pretrain/{mod1} reducer.pkl', "wb"))
+mod2_train, mod2_reducer = embedding(mod2_train, args2.input_feats, random_seed=args2.random_seed)
+pk.dump(mod2_reducer, open(f'pretrain/{mod2} reducer.pkl', "wb"))
