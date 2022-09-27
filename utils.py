@@ -19,47 +19,63 @@ from matplotlib import pyplot as plt
 
 def plot_loss(train_loss, val_loss):
     plt.figure()
-    plt.rc('xtick', labelsize=24)
-    plt.rc('ytick', labelsize=24)
+    plt.rc('xtick', labelsize=20)
+    plt.rc('ytick', labelsize=20)
     plt.plot(train_loss)
     plt.plot(val_loss)
-    plt.ylabel('loss', fontsize=24)
-    plt.xlabel('epochs', fontsize=24)
+    plt.ylabel('loss', fontsize=20)
+    plt.xlabel('epochs', fontsize=20)
     plt.legend(['train loss', 'val loss'], loc='upper right', prop={'size': 20})
     plt.show()
 
 
 def read_logs(path):
     with open(path, "r") as log_file:
-        classification_train_loss = []
-        classification_val_loss = []
+        classification_train_loss1 = []
+        classification_val_loss1 = []
+        classification_train_loss2 = []
+        classification_val_loss2 = []
         embed_train_loss = []
         embed_test_loss = []
-        predict_train_loss = []
-        predict_test_loss = []
+        predict_train_loss1 = []
+        predict_test_loss1 = []
+        predict_train_loss2 = []
+        predict_test_loss2 = []
 
+        i = 0
         types = 0
         for line in log_file.readlines():
-            line = line.split(' ')
-            if line == 'epoch: 0':
+            if i == 180:
+                a = 10
+            if line == 'epoch:  0\n':
                 types += 1
-            if line[0] == 'training':
+            line = line.split(' ')
+            if line[0] == 'training' and line[1] == 'loss:':
                 if types == 1:
-                    classification_train_loss.append(float(line[2]))
-                if types == 2:
+                    classification_train_loss1.append(float(line[2]))
+                elif types == 2:
+                    classification_train_loss2.append(float(line[2]))
+                elif types == 3:
                     embed_train_loss.append(float(line[2]))
-                if types == 3:
-                    predict_train_loss.append(float(line[2]))
-            elif line[0] == 'validation':
+                elif types == 4:
+                    predict_train_loss1.append(float(line[3]))
+                elif types == 5:
+                    predict_train_loss2.append(float(line[3]))
+            elif line[0] == 'validation' and line[1] == 'loss:':
                 if types == 1:
-                    classification_val_loss.append(float(line[2]))
-                if types == 2:
+                    classification_val_loss1.append(float(line[2]))
+                elif types == 2:
+                    classification_val_loss2.append(float(line[2]))
+                elif types == 3:
                     embed_test_loss.append(float(line[2]))
-                if types == 3:
-                    predict_test_loss.append(float(line[2]))
+                elif types == 4:
+                    predict_test_loss1.append(float(line[2]))
+                elif types == 5:
+                    predict_test_loss2.append(float(line[2]))
+            i += 1
 
-        return classification_train_loss, classification_val_loss, embed_train_loss, embed_test_loss \
-            , predict_train_loss, predict_test_loss
+        return classification_train_loss1, classification_val_loss1, classification_train_loss2, classification_val_loss2,\
+               embed_train_loss, embed_test_loss, predict_train_loss1, predict_test_loss1, predict_train_loss2, predict_test_loss2
 
 
 def embedding(mod, n_components, random_seed=0):
@@ -836,6 +852,13 @@ class ResidualBlock(nn.Module):
 
         return x
 
+class Nonelayer(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x):
+        return x
+
 
 class AbsModel(nn.Module):
     def __init__(self, input_feats, hid_feats, latent_feats, num_layer, activation, normalization, dropout,
@@ -871,6 +894,8 @@ class AbsModel(nn.Module):
             self.layer_acts.append(nn.ReLU())
         elif act_out == 'sigmoid':
             self.layer_acts.append(nn.Sigmoid())
+        elif act_out == 'none':
+            self.layer_acts.append(Nonelayer())
 
         if normalization == 'batch':
             for i in range(num_layer - 1):

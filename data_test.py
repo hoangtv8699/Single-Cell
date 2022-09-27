@@ -1,22 +1,27 @@
 import random
 import scanpy as sc
 import pickle as pk
+from scipy.sparse import csc_matrix
 
 raw_path = 'data/multiome_BMMC_processed/raw.h5ad'
 processed_path = 'data/explore/multiome/multiome_gex_processed_training.h5ad'
-train_path = 'data/train/cite/adt.h5ad'
+train_path = 'data/train/cite/gex.h5ad'
+
+reducer_path = 'pretrain/GEX reducer cite nolog.pkl'
 
 # raw = sc.read_h5ad(raw_path)
 # processed = sc.read_h5ad(processed_path)
 train = sc.read_h5ad(train_path)
+mod1_reducer = pk.load(open(reducer_path, 'rb'))
 
 # pretrain_path = 'pretrain/'
 
 print(train.X.max())
 print(train.X.min())
-sc.pp.log1p(train)
-print(train.X.max())
-print(train.X.min())
+# sc.pp.log1p(train)
+x = csc_matrix(mod1_reducer.transform(train.X))
+print(x.max())
+print(x.min())
 
 
 

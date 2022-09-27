@@ -43,7 +43,7 @@ args1 = Namespace(
     out_feats=256,
     random_seed=17,
     activation='relu',
-    act_out='sigmoid',
+    act_out='one',
     num_embed_layer=8,  # if using residual, this number must divisible by 2
     num_class_layer=6,  # if using residual, this number must divisible by 2
     num_pred_layer=6,  # if using residual, this number must divisible by 2
@@ -66,7 +66,7 @@ args2 = Namespace(
     out_feats=256,
     random_seed=17,
     activation='relu',
-    act_out='relu',
+    act_out='none',
     num_embed_layer=8,  # if using residual, this number must divisible by 2
     num_class_layer=6,  # if using residual, this number must divisible by 2
     num_pred_layer=6,  # if using residual, this number must divisible by 2
@@ -163,46 +163,46 @@ params = {'batch_size': 256,
           'shuffle': True,
           'num_workers': 0}
 
-# train model to classification
-training_set1 = ModalityDataset2(net1_input_train, label_train, types='classification')
-training_set2 = ModalityDataset2(net2_input_train, label_train, types='classification')
-val_set1 = ModalityDataset2(net1_input_val, label_val, types='classification')
-val_set2 = ModalityDataset2(net2_input_val, label_val, types='classification')
-
-train_loader1 = DataLoader(training_set1, **params)
-train_loader2 = DataLoader(training_set2, **params)
-val_loader1 = DataLoader(val_set1, **params)
-val_loader2 = DataLoader(val_set2, **params)
-
-best_state_dict1 = train_classification(train_loader1, val_loader1, net1, args1, logger)
-torch.save(best_state_dict1,
-           f'{param["save_model_path"]}{time_train}/model {mod1} param classification.pkl')
-
-best_state_dict2 = train_classification(train_loader2, val_loader2, net2, args2, logger)
-torch.save(best_state_dict2,
-           f'{param["save_model_path"]}{time_train}/model {mod2} param classification.pkl')
-
-# load pretrained from dir
-net1.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod1} param classification.pkl'))
-net2.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod2} param classification.pkl'))
-
-# train model by contrastive
-training_set = ModalityDataset2(net1_input_train, net2_input_train, types='2mod')
-val_set = ModalityDataset2(net1_input_val, net2_input_val, types='2mod')
-
-train_loader = DataLoader(training_set, **params)
-val_loader = DataLoader(val_set, **params)
-
-best_state_dict1, best_state_dict2 = train_contrastive(train_loader, val_loader, net1, net2, args1, logger)
-
-torch.save(best_state_dict1,
-           f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl')
-torch.save(best_state_dict2,
-           f'{param["save_model_path"]}{time_train}/model {mod2} param contrastive.pkl')
-
-# load pretrained from dir
-net1.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl'))
-net2.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod2} param contrastive.pkl'))
+# # train model to classification
+# training_set1 = ModalityDataset2(net1_input_train, label_train, types='classification')
+# training_set2 = ModalityDataset2(net2_input_train, label_train, types='classification')
+# val_set1 = ModalityDataset2(net1_input_val, label_val, types='classification')
+# val_set2 = ModalityDataset2(net2_input_val, label_val, types='classification')
+#
+# train_loader1 = DataLoader(training_set1, **params)
+# train_loader2 = DataLoader(training_set2, **params)
+# val_loader1 = DataLoader(val_set1, **params)
+# val_loader2 = DataLoader(val_set2, **params)
+#
+# best_state_dict1 = train_classification(train_loader1, val_loader1, net1, args1, logger)
+# torch.save(best_state_dict1,
+#            f'{param["save_model_path"]}{time_train}/model {mod1} param classification.pkl')
+#
+# best_state_dict2 = train_classification(train_loader2, val_loader2, net2, args2, logger)
+# torch.save(best_state_dict2,
+#            f'{param["save_model_path"]}{time_train}/model {mod2} param classification.pkl')
+#
+# # load pretrained from dir
+# net1.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod1} param classification.pkl'))
+# net2.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod2} param classification.pkl'))
+#
+# # train model by contrastive
+# training_set = ModalityDataset2(net1_input_train, net2_input_train, types='2mod')
+# val_set = ModalityDataset2(net1_input_val, net2_input_val, types='2mod')
+#
+# train_loader = DataLoader(training_set, **params)
+# val_loader = DataLoader(val_set, **params)
+#
+# best_state_dict1, best_state_dict2 = train_contrastive(train_loader, val_loader, net1, net2, args1, logger)
+#
+# torch.save(best_state_dict1,
+#            f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl')
+# torch.save(best_state_dict2,
+#            f'{param["save_model_path"]}{time_train}/model {mod2} param contrastive.pkl')
+#
+# # load pretrained from dir
+# net1.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl'))
+# net2.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod2} param contrastive.pkl'))
 
 # train model to predict modality
 training_set1 = ModalityDataset2(net1_input_train, net1_output_train, types='2mod')
