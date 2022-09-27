@@ -15360,3 +15360,64 @@ epoch:  78
 training loss:  0.09745470733879127
 validation loss: 0.09026216215491475
 validation rmse: 0.3004366202281402
+epoch:  79
+training loss:  0.09737876079554847
+validation loss: 0.09062614053460759
+validation rmse: 0.3010417574237328
+epoch:  80
+training loss:  0.09752618679878589
+validation loss: 0.09038083137531733
+validation rmse: 0.3006340527634335
+epoch:  81
+training loss:  0.09733700376720616
+validation loss: 0.09048352918755652
+validation rmse: 0.30080480534192555
+epoch:  82
+training loss:  0.09730416606774986
+validation loss: 0.09059319399290483
+validation rmse: 0.30098703771917956
+epoch:  83
+training loss:  0.09726910052247238
+validation loss: 0.09016397007960285
+validation rmse: 0.3002731630879018
+epoch:  84
+training loss:  0.09684871625820304
+validation loss: 0.09039806171769857
+validation rmse: 0.3006627075896543
+epoch:  85
+training loss:  0.09705091094898445
+validation loss: 0.09043517584489458
+validation rmse: 0.300724419875595
+epoch:  86
+training loss:  0.09702585629212748
+validation loss: 0.0904135234647195
+validation rmse: 0.30068841830996834
+epoch:  87
+training loss:  0.0969077821872328
+validation loss: 0.09080450672258888
+validation rmse: 0.30133786292131975
+epoch:  88
+training loss:  0.09675459217180132
+validation loss: 0.09033817927592036
+validation rmse: 0.3005631079653259
+epoch:  89
+training loss:  0.09688708106548469
+validation loss: 0.09131508602922003
+validation rmse: 0.3021838627290323
+epoch:  90
+training loss:  0.09674397444455621
+validation loss: 0.0902176891642418
+validation rmse: 0.30036259751520294
+epoch:  91
+training loss:  0.0966322123417645
+validation loss: 0.09076592443022853
+validation rmse: 0.30127384154701636
+epoch:  92
+training loss:  0.09663560839101022
+validation loss: 0.09035200873785561
+validation rmse: 0.3005861099866609
+epoch:  93
+training loss:  0.09679691786870696
+validation loss: 0.0905572564742759
+validation rmse: 0.3009273294785648
+early stopping because val loss not decrease for 10 epoch

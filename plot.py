@@ -35,13 +35,13 @@ def embedding(mod, n_components, random_seed=0):
     return truncated_mod, mod_reducer
 
 
-dataset_path = 'data/train/multiome/'
+dataset_path = 'data/train/cite/'
 pretrain_path = 'pretrain/'
 
 param = {
     'use_pretrained': True,
-    'input_train_mod1': f'{dataset_path}gex.h5ad',
-    'input_train_mod2': f'{dataset_path}atac.h5ad',
+    'input_train_mod1': f'{dataset_path}adt.h5ad',
+    'input_train_mod2': f'{dataset_path}gex.h5ad',
     'subset_pretrain1': f'{pretrain_path}GEX_subset.pkl',
     'subset_pretrain2': f'{pretrain_path}ATAC_subset.pkl',
     'output_pretrain': 'pretrain/',
@@ -50,7 +50,7 @@ param = {
 }
 
 args1 = Namespace(
-    input_feats=256,
+    input_feats=32,
     num_class=22,
     embed_hid_feats=512,
     latent_feats=32,
@@ -115,6 +115,6 @@ mod1_train, _, mod2_train, _, label_train, label_val = train_test_split(train_mo
                                                                         stratify=input_label)
 
 mod1_train, mod1_reducer = embedding(mod1_train, args1.input_feats, random_seed=args1.random_seed)
-pk.dump(mod1_reducer, open(f'pretrain/{mod1} reducer multiome nolog.pkl', "wb"))
+pk.dump(mod1_reducer, open(f'pretrain/{mod1} reducer cite nolog.pkl', "wb"))
 mod2_train, mod2_reducer = embedding(mod2_train, args2.input_feats, random_seed=args2.random_seed)
-pk.dump(mod2_reducer, open(f'pretrain/{mod2} reducer multiome nolog.pkl', "wb"))
+pk.dump(mod2_reducer, open(f'pretrain/{mod2} reducer cite nolog.pkl', "wb"))
