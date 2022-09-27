@@ -1,5 +1,5 @@
 import torch
-import dgl
+# import dgl
 import math
 import scipy
 import numpy as np
@@ -72,11 +72,11 @@ def embedding(mod, n_components, random_seed=0):
     return truncated_mod, mod_reducer
 
 
-def knn_graph_construction(mod_train, k):
-    mod_train = torch.Tensor(mod_train)
-    knn_graph = dgl.knn_graph(mod_train, k)
-    knn_graph = dgl.add_self_loop(knn_graph)
-    return knn_graph
+# def knn_graph_construction(mod_train, k):
+#     mod_train = torch.Tensor(mod_train)
+#     knn_graph = dgl.knn_graph(mod_train, k)
+#     knn_graph = dgl.add_self_loop(knn_graph)
+#     return knn_graph
 
 
 def validate(model, graph, labels, type='x2x', residual=True):

@@ -1,6 +1,5 @@
 import os
 import time
-import dgl
 import torch
 import pandas as pd
 import scanpy as sc
