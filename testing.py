@@ -84,3 +84,4 @@ with torch.no_grad():
 
 rmse = math.sqrt(rmse / len(val_loader.dataset))
 print(rmse)
+

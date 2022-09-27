@@ -27,7 +27,7 @@ param = {
     'input_train_mod1': f'{dataset_path}adt.h5ad',
     'input_train_mod2': f'{dataset_path}gex.h5ad',
     'subset_pretrain1': f'{pretrain_path}ADT reducer cite nolog.pkl',
-    'subset_pretrain2': f'{pretrain_path}GEX reducer cite nolog.pkl',
+    'subset_pretrain2': f'{pretrain_path}GEX reducer cite.pkl',
     'output_pretrain': 'pretrain/',
     'save_model_path': 'saved_model/',
     'logs_path': 'logs/'
@@ -103,7 +103,7 @@ mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
 # log norm train mod1
 # sc.pp.log1p(train_mod1)
-# sc.pp.log1p(train_mod2)
+sc.pp.log1p(train_mod2)
 
 # net1 input and output
 net1_input = csc_matrix(mod1_reducer.transform(train_mod1.X))
