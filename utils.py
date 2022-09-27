@@ -717,9 +717,9 @@ def train_contrastive(train_loader, val_loader, net1, net2, args1, logger):
 def train_predict(train_loader, val_loader, net, args, logger, mod_reducer):
     print('train predict')
     net.cuda()
-    # net_param = []
-    # net_param.extend(net.predict.parameters())
-    opt = torch.optim.Adam(net.parameters(), args.lr_predict)
+    net_param = []
+    net_param.extend(net.predict.parameters())
+    opt = torch.optim.Adam(net_param, args.lr_predict)
 
     training_loss = []
     val_loss = []
@@ -761,12 +761,13 @@ def train_predict(train_loader, val_loader, net, args, logger, mod_reducer):
                 loss = criterion(out, label)
                 running_loss += loss.item() * val_batch.size(0)
                 # using reducer
-                out_ori = mod_reducer.inverse_transform(out.detach().cpu().numpy())
-                label_ori = mod_reducer.inverse_transform(label.detach().cpu().numpy())
-                running_rmse += mean_squared_error(label_ori, out_ori) * val_batch.size(0)
-                # not using reducer
-                # running_rmse += mean_squared_error(label.detach().cpu().numpy(),
-                #                                        out.detach().cpu().numpy()) * val_batch.size(0)
+                if mod_reducer:
+                    out_ori = mod_reducer.inverse_transform(out.detach().cpu().numpy())
+                    label_ori = mod_reducer.inverse_transform(label.detach().cpu().numpy())
+                    running_rmse += mean_squared_error(label_ori, out_ori) * val_batch.size(0)
+                else:
+                    running_rmse += mean_squared_error(label.detach().cpu().numpy(),
+                                                       out.detach().cpu().numpy()) * val_batch.size(0)
 
             val_loss.append(running_loss / len(val_loader.dataset))
             rmse.append(math.sqrt(running_rmse / len(val_loader.dataset)))

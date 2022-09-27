@@ -1,0 +1,797 @@
+class name: ['B1 B' 'CD14+ Mono' 'CD16+ Mono' 'CD4+ T activated' 'CD4+ T naive'
+ 'CD8+ T' 'CD8+ T naive' 'Erythroblast' 'G/M prog' 'HSC'
+ 'ID2-hi myeloid prog' 'ILC' 'Lymph prog' 'MK/E prog' 'NK' 'Naive CD20+ B'
+ 'Normoblast' 'Plasma cell' 'Proerythroblast' 'Transitional B' 'cDC2'
+ 'pDC']
+args1: Namespace(act_out='sigmoid', activation='relu', class_hid_feats=512, classes_=array(['B1 B', 'CD14+ Mono', 'CD16+ Mono', 'CD4+ T activated',
+       'CD4+ T naive', 'CD8+ T', 'CD8+ T naive', 'Erythroblast',
+       'G/M prog', 'HSC', 'ID2-hi myeloid prog', 'ILC', 'Lymph prog',
+       'MK/E prog', 'NK', 'Naive CD20+ B', 'Normoblast', 'Plasma cell',
+       'Proerythroblast', 'Transitional B', 'cDC2', 'pDC'], dtype=object), dropout=0.2, embed_hid_feats=512, epochs=1000, input_feats=256, latent_feats=64, lr_classification=0.0001, lr_embed=0.0001, lr_predict=0.0001, normalization='batch', num_class=22, num_class_layer=6, num_embed_layer=8, num_pred_layer=6, out_feats=256, patience=10, pred_hid_feats=512, random_seed=17)
+args2: Namespace(act_out='relu', activation='relu', class_hid_feats=512, classes_=array(['B1 B', 'CD14+ Mono', 'CD16+ Mono', 'CD4+ T activated',
+       'CD4+ T naive', 'CD8+ T', 'CD8+ T naive', 'Erythroblast',
+       'G/M prog', 'HSC', 'ID2-hi myeloid prog', 'ILC', 'Lymph prog',
+       'MK/E prog', 'NK', 'Naive CD20+ B', 'Normoblast', 'Plasma cell',
+       'Proerythroblast', 'Transitional B', 'cDC2', 'pDC'], dtype=object), dropout=0.2, embed_hid_feats=512, epochs=1000, input_feats=256, latent_feats=64, lr_classification=0.0001, lr_embed=0.0001, lr_predict=0.0001, normalization='batch', num_class=22, num_class_layer=6, num_embed_layer=8, num_pred_layer=6, out_feats=256, patience=10, pred_hid_feats=512, random_seed=17)
+net1: ContrastiveModel(
+  (embed): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=256, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=512, bias=True)
+      (4): Linear(in_features=512, out_features=512, bias=True)
+      (5): Linear(in_features=512, out_features=512, bias=True)
+      (6): Linear(in_features=512, out_features=512, bias=True)
+      (7): Linear(in_features=512, out_features=64, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+      (7): ReLU()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (5): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (classification): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=64, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=512, bias=True)
+      (4): Linear(in_features=512, out_features=512, bias=True)
+      (5): Linear(in_features=512, out_features=22, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): Softmax(dim=1)
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (predict): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=64, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=512, bias=True)
+      (4): Linear(in_features=512, out_features=512, bias=True)
+      (5): Linear(in_features=512, out_features=256, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): Sigmoid()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+)
+net2: ContrastiveModel(
+  (embed): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=256, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=512, bias=True)
+      (4): Linear(in_features=512, out_features=512, bias=True)
+      (5): Linear(in_features=512, out_features=512, bias=True)
+      (6): Linear(in_features=512, out_features=512, bias=True)
+      (7): Linear(in_features=512, out_features=64, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+      (6): ReLU()
+      (7): ReLU()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (5): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (classification): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=64, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=512, bias=True)
+      (4): Linear(in_features=512, out_features=512, bias=True)
+      (5): Linear(in_features=512, out_features=22, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): Softmax(dim=1)
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (predict): AbsModel(
+    (hid_layer): ModuleList(
+      (0): Linear(in_features=64, out_features=512, bias=True)
+      (1): Linear(in_features=512, out_features=512, bias=True)
+      (2): Linear(in_features=512, out_features=512, bias=True)
+      (3): Linear(in_features=512, out_features=512, bias=True)
+      (4): Linear(in_features=512, out_features=512, bias=True)
+      (5): Linear(in_features=512, out_features=256, bias=True)
+    )
+    (layer_acts): ModuleList(
+      (0): ReLU()
+      (1): ReLU()
+      (2): ReLU()
+      (3): ReLU()
+      (4): ReLU()
+      (5): ReLU()
+    )
+    (layer_norm): ModuleList(
+      (0): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (3): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (4): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+)
+epoch:  0
+training loss:  2.789687927232727
+validation loss: 2.422836099175846
+validation rmse: 0.07296888591137697
+epoch:  1
+training loss:  2.652341871841153
+validation loss: 2.2658590244966397
+validation rmse: 0.07056545397412713
+epoch:  2
+training loss:  2.5596801074165523
+validation loss: 2.239956009808709
+validation rmse: 0.07016094833447031
+epoch:  3
+training loss:  2.533827621887795
+validation loss: 2.2226392294939825
+validation rmse: 0.06988921745107901
+epoch:  4
+training loss:  2.5221801157757286
+validation loss: 2.218421797471888
+validation rmse: 0.06982287985217477
+epoch:  5
+training loss:  2.515819851121832
+validation loss: 2.21523622007931
+validation rmse: 0.06977273087309317
+epoch:  6
+training loss:  2.5118177855066546
+validation loss: 2.209906562244191
+validation rmse: 0.0696887475651467
+epoch:  7
+training loss:  2.5062760942420304
+validation loss: 2.2071697591893815
+validation rmse: 0.06964558185562604
+epoch:  8
+training loss:  2.4999850293805825
+validation loss: 2.1999934007981246
+validation rmse: 0.06953226517669275
+epoch:  9
+training loss:  2.496020529760326
+validation loss: 2.199243418188656
+validation rmse: 0.06952041430451329
+epoch:  10
+training loss:  2.4943229345015716
+validation loss: 2.198086872437421
+validation rmse: 0.0695021301210651
+epoch:  11
+training loss:  2.491201387440009
+validation loss: 2.194709559496711
+validation rmse: 0.06944871705100895
+epoch:  12
+training loss:  2.48919460041666
+validation loss: 2.1931897148805506
+validation rmse: 0.0694246655424769
+epoch:  13
+training loss:  2.4869721034700216
+validation loss: 2.1927846806470086
+validation rmse: 0.06941825664644552
+epoch:  14
+training loss:  2.485620788335613
+validation loss: 2.192229586432962
+validation rmse: 0.06940946888595532
+epoch:  15
+training loss:  2.4853026201320887
+validation loss: 2.189191075156717
+validation rmse: 0.06936134870331226
+epoch:  16
+training loss:  2.4841167391746164
+validation loss: 2.1901345407822554
+validation rmse: 0.06937629343684654
+epoch:  17
+training loss:  2.482719898248815
+validation loss: 2.1877934872122373
+validation rmse: 0.0693392043130286
+epoch:  18
+training loss:  2.4824545132453633
+validation loss: 2.187837425961214
+validation rmse: 0.06933990207863797
+epoch:  19
+training loss:  2.481078737818617
+validation loss: 2.184608483258416
+validation rmse: 0.06928871496078398
+epoch:  20
+training loss:  2.479639066125389
+validation loss: 2.185124284744263
+validation rmse: 0.06929689481123871
+epoch:  21
+training loss:  2.478865185153515
+validation loss: 2.1830009748795454
+validation rmse: 0.06926321761771916
+epoch:  22
+training loss:  2.478153207063812
+validation loss: 2.1832848087759578
+validation rmse: 0.06926771863951171
+epoch:  23
+training loss:  2.4769025838597662
+validation loss: 2.1806884900261374
+validation rmse: 0.06922652198276094
+epoch:  24
+training loss:  2.4733884675589684
+validation loss: 2.1765994292988498
+validation rmse: 0.06916158813477653
+epoch:  25
+training loss:  2.470730038069761
+validation loss: 2.1760616760253906
+validation rmse: 0.06915304306502712
+epoch:  26
+training loss:  2.470050991095856
+validation loss: 2.1759949607849123
+validation rmse: 0.06915198192427435
+epoch:  27
+training loss:  2.469744139800953
+validation loss: 2.175969773124246
+validation rmse: 0.06915158405369153
+epoch:  28
+training loss:  2.469541342274289
+validation loss: 2.175952076968025
+validation rmse: 0.0691513024595655
+epoch:  29
+training loss:  2.4694752185067013
+validation loss: 2.175910946341122
+validation rmse: 0.06915064741601111
+epoch:  30
+training loss:  2.4693448816244277
+validation loss: 2.1758925389682546
+validation rmse: 0.06915035741240477
+epoch:  31
+training loss:  2.469275875736446
+validation loss: 2.175889248455272
+validation rmse: 0.06915030297440229
+epoch:  32
+training loss:  2.4691489962290585
+validation loss: 2.175874339945176
+validation rmse: 0.06915006689896196
+epoch:  33
+training loss:  2.4691199312573677
+validation loss: 2.175870271009557
+validation rmse: 0.06915000277317075
+epoch:  34
+training loss:  2.4690299230629127
+validation loss: 2.175843100155101
+validation rmse: 0.06914956837169711
+epoch:  35
+training loss:  2.4689805576239077
+validation loss: 2.175797190834494
+validation rmse: 0.06914884212267285
+epoch:  36
+training loss:  2.469046615680188
+validation loss: 2.175854492748485
+validation rmse: 0.06914975213996145
+epoch:  37
+training loss:  2.46896082601452
+validation loss: 2.1758178284588983
+validation rmse: 0.06914916871891708
+epoch:  38
+training loss:  2.4688672033864254
+validation loss: 2.1758229268578924
+validation rmse: 0.06914924884898865
+epoch:  39
+training loss:  2.4688695725720833
+validation loss: 2.1758002710903392
+validation rmse: 0.06914889128539516
+epoch:  40
+training loss:  2.4687759315024285
+validation loss: 2.175798757272608
+validation rmse: 0.06914886550059982
+epoch:  41
+training loss:  2.468743916591786
+validation loss: 2.175789156857659
+validation rmse: 0.06914871085342207
+epoch:  42
+training loss:  2.468726307096033
+validation loss: 2.175766518200145
+validation rmse: 0.069148354164874
+epoch:  43
+training loss:  2.4686954679315067
+validation loss: 2.175742687337539
+validation rmse: 0.06914797507075437
+epoch:  44
+training loss:  2.4685923273384707
+validation loss: 2.175756005792057
+validation rmse: 0.06914818633485054
+epoch:  45
+training loss:  2.4686180341506216
+validation loss: 2.17573914382037
+validation rmse: 0.06914791854087349
+epoch:  46
+training loss:  2.468576634655275
+validation loss: 2.175722194222843
+validation rmse: 0.06914764958755906
+epoch:  47
+training loss:  2.468563339138036
+validation loss: 2.175731334461885
+validation rmse: 0.069147793081958
+epoch:  48
+training loss:  2.4685018127679412
+validation loss: 2.175710096527548
+validation rmse: 0.06914745720803539
+epoch:  49
+training loss:  2.468510882100465
+validation loss: 2.175697058172787
+validation rmse: 0.06914724956716493
+epoch:  50
+training loss:  2.4684237300536043
+validation loss: 2.175759262309355
+validation rmse: 0.06914823796990378
+epoch:  51
+training loss:  2.4684283158549842
+validation loss: 2.175707405314726
+validation rmse: 0.06914741422402895
+epoch:  52
+training loss:  2.468401934947063
+validation loss: 2.175694745680865
+validation rmse: 0.06914721420472533
+epoch:  53
+training loss:  2.4683803313135457
+validation loss: 2.1757014298158532
+validation rmse: 0.06914731795161003
+epoch:  54
+training loss:  2.468309603091046
+validation loss: 2.175699137407191
+validation rmse: 0.06914728170661075
+epoch:  55
+training loss:  2.468271569747829
+validation loss: 2.175681294441223
+validation rmse: 0.06914699940885069
+epoch:  56
+training loss:  2.4682754252559316
+validation loss: 2.1756761062846466
+validation rmse: 0.06914691779302529
+epoch:  57
+training loss:  2.46826923265722
+validation loss: 2.175694574356079
+validation rmse: 0.06914721056817821
+epoch:  58
+training loss:  2.468222919028397
+validation loss: 2.175683858310475
+validation rmse: 0.06914704116825317
+epoch:  59
+training loss:  2.468224155672811
+validation loss: 2.175614340277279
+validation rmse: 0.06914593487942038
+epoch:  60
+training loss:  2.4682064475726895
+validation loss: 2.1756969625809615
+validation rmse: 0.06914724794933808
+epoch:  61
+training loss:  2.4681544678710345
+validation loss: 2.1756415031096514
+validation rmse: 0.06914636688883397
+epoch:  62
+training loss:  2.4681327158571453
+validation loss: 2.175668218500474
+validation rmse: 0.06914679322915598
+epoch:  63
+training loss:  2.4681093050005747
+validation loss: 2.1756066124859976
+validation rmse: 0.069145811237593
+epoch:  64
+training loss:  2.468090904375592
+validation loss: 2.17570961671717
+validation rmse: 0.06914745005222299
+epoch:  65
+training loss:  2.468026771087052
+validation loss: 2.1756473185595344
+validation rmse: 0.06914645984448889
+epoch:  66
+training loss:  2.4680045492684863
+validation loss: 2.1756517344082105
+validation rmse: 0.06914652967484082
+epoch:  67
+training loss:  2.4680507041926565
+validation loss: 2.1756607254252716
+validation rmse: 0.0691466720433539
+epoch:  68
+training loss:  2.467970929218881
+validation loss: 2.175648240369909
+validation rmse: 0.06914647455087557
+epoch:  69
+training loss:  2.4679877441439766
+validation loss: 2.175578938147601
+validation rmse: 0.06914537362316733
+epoch:  70
+training loss:  2.467947597415382
+validation loss: 2.1756894870084875
+validation rmse: 0.06914712878305478
+epoch:  71
+training loss:  2.4678927805687954
+validation loss: 2.1756471471225516
+validation rmse: 0.06914645748031137
+epoch:  72
+training loss:  2.4679218047795253
+validation loss: 2.1756393617742202
+validation rmse: 0.06914633311526894
+epoch:  73
+training loss:  2.4678846019175094
+validation loss: 2.1757232232374304
+validation rmse: 0.06914766774482457
+epoch:  74
+training loss:  2.4678477807546484
+validation loss: 2.1756454006643855
+validation rmse: 0.06914642920049523
+epoch:  75
+training loss:  2.4678720532024228
+validation loss: 2.1756627902984618
+validation rmse: 0.0691467053651527
+epoch:  76
+training loss:  2.4678333710005678
+validation loss: 2.175636276806102
+validation rmse: 0.06914628467804695
+epoch:  77
+training loss:  2.4678045679638747
+validation loss: 2.175692418939927
+validation rmse: 0.06914717549727642
+epoch:  78
+training loss:  2.4677435747032592
+validation loss: 2.175667813132791
+validation rmse: 0.06914678423518307
+epoch:  79
+training loss:  2.4677965580422687
+validation loss: 2.1757262486850513
+validation rmse: 0.06914771419406383
+early stopping because val loss not decrease for 10 epoch
+epoch:  0
+training loss:  2.9180924611126278
+validation loss: 2.1627786968455593
+validation rmse: 0.20303543714950834
+epoch:  1
+training loss:  2.118004061787842
+validation loss: 1.8214450173658483
+validation rmse: 0.18632616212116493
+epoch:  2
+training loss:  1.8295641193067695
+validation loss: 1.5799054158154655
+validation rmse: 0.17353271436187076
+epoch:  3
+training loss:  1.6597655576103734
+validation loss: 1.4569274132672478
+validation rmse: 0.1666421163247162
+epoch:  4
+training loss:  1.5473516050177347
+validation loss: 1.3749199696148142
+validation rmse: 0.1618842233203316
+epoch:  5
+training loss:  1.4678941107863606
+validation loss: 1.3131081057155833
+validation rmse: 0.15820349118558102
+epoch:  6
+training loss:  1.4072226512120998
+validation loss: 1.2593478237039903
+validation rmse: 0.15493112223095346
+epoch:  7
+training loss:  1.3476258332644178
+validation loss: 1.1891745594810037
+validation rmse: 0.15055272709171397
+epoch:  8
+training loss:  1.2956767980352017
+validation loss: 1.1527191387625302
+validation rmse: 0.14822708780857446
+epoch:  9
+training loss:  1.247959859818446
+validation loss: 1.121313980663524
+validation rmse: 0.14619396427375894
+epoch:  10
+training loss:  1.2132731713633191
+validation loss: 1.0890768121831558
+validation rmse: 0.14407714284099735
+epoch:  11
+training loss:  1.1828810776273149
+validation loss: 1.0601982402801513
+validation rmse: 0.14215409324425826
+epoch:  12
+training loss:  1.1519065223711005
+validation loss: 1.0203903455734253
+validation rmse: 0.13945978532814676
+epoch:  13
+training loss:  1.1289865154020768
+validation loss: 1.000993608194239
+validation rmse: 0.13812792450322103
+epoch:  14
+training loss:  1.1043068430026102
+validation loss: 0.9767646486899432
+validation rmse: 0.13644599672254742
+epoch:  15
+training loss:  1.0887087569888383
+validation loss: 0.9517151496550617
+validation rmse: 0.1346850290204561
+epoch:  16
+training loss:  1.0726639529749862
+validation loss: 0.9442100651404437
+validation rmse: 0.13415292513970226
+epoch:  17
+training loss:  1.0607810831862972
+validation loss: 0.9375212085667779
+validation rmse: 0.1336769057391569
+epoch:  18
+training loss:  1.051545828133533
+validation loss: 0.9236983497844022
+validation rmse: 0.1326877770544001
+epoch:  19
+training loss:  1.0399237396664578
+validation loss: 0.9199840056194979
+validation rmse: 0.13242072917595407
+epoch:  20
+training loss:  1.0307521221247573
+validation loss: 0.9107244632103864
+validation rmse: 0.1317526436498019
+epoch:  21
+training loss:  1.0204665934613706
+validation loss: 0.9035640982179081
+validation rmse: 0.1312336839190017
+epoch:  22
+training loss:  1.0134371945713487
+validation loss: 0.895377801137812
+validation rmse: 0.13063784304459586
+epoch:  23
+training loss:  1.0079435898534337
+validation loss: 0.893941423219793
+validation rmse: 0.13053301654032293
+epoch:  24
+training loss:  1.0097726096755808
+validation loss: 0.8938168912214391
+validation rmse: 0.13052392201192373
+epoch:  25
+training loss:  1.0055752517064678
+validation loss: 0.8930596379111795
+validation rmse: 0.13046861900156398
+epoch:  26
+training loss:  1.0029205311405178
+validation loss: 0.8924425310247085
+validation rmse: 0.1304235365284353
+epoch:  27
+training loss:  1.0045362020485271
+validation loss: 0.8944938363187454
+validation rmse: 0.1305733419000559
+epoch:  28
+training loss:  1.00127814670941
+validation loss: 0.8914098392374376
+validation rmse: 0.13034805177598324
+epoch:  29
+training loss:  0.9999736820165784
+validation loss: 0.8914002824110143
+validation rmse: 0.1303473519883855
+epoch:  30
+training loss:  1.0002892918245332
+validation loss: 0.8911988816822276
+validation rmse: 0.130332630021015
+epoch:  31
+training loss:  0.9998767904005604
+validation loss: 0.8915345174284542
+validation rmse: 0.13035716939667946
+epoch:  32
+training loss:  0.9980441435604974
+validation loss: 0.8899069223123438
+validation rmse: 0.1302381244256864
+epoch:  33
+training loss:  0.9961851614363604
+validation loss: 0.8905467746959013
+validation rmse: 0.1302849384509296
+epoch:  34
+training loss:  0.9950709876627124
+validation loss: 0.8909016073731815
+validation rmse: 0.1303108918407857
+epoch:  35
+training loss:  0.9959232195994387
+validation loss: 0.8897954858050627
+validation rmse: 0.13022996875830117
+epoch:  36
+training loss:  0.993809092288598
+validation loss: 0.8898596843270694
+validation rmse: 0.13023466904122846
+epoch:  37
+training loss:  0.9906795195696287
+validation loss: 0.8885231404584997
+validation rmse: 0.13013682597679163
+epoch:  38
+training loss:  0.9900637315747429
+validation loss: 0.8889602909368627
+validation rmse: 0.13016883367282822
+epoch:  39
+training loss:  0.989961102900224
+validation loss: 0.8898558307255016
+validation rmse: 0.13023438633478843
+epoch:  40
+training loss:  0.9904533088172955
+validation loss: 0.8897217225467458
+validation rmse: 0.13022457283588443
+epoch:  41
+training loss:  0.9900939495211509
+validation loss: 0.8895368515182944
+validation rmse: 0.13021104145113555
+epoch:  42
+training loss:  0.9876019588032251
+validation loss: 0.8871548792614656
+validation rmse: 0.1300365849898388
+epoch:  43
+training loss:  0.9889114439272368
+validation loss: 0.8869377446455114
+validation rmse: 0.13002067193349023
+epoch:  44
+training loss:  0.9870891275094659
+validation loss: 0.8868518322776345
+validation rmse: 0.13001437511665948
+epoch:  45
+training loss:  0.9867317542378408
+validation loss: 0.8880027067521039
+validation rmse: 0.1300987073662031
+epoch:  46
+training loss:  0.9880150856941067
+validation loss: 0.889362782534431
+validation rmse: 0.13019830090712184
+epoch:  47
+training loss:  0.986194461654229
+validation loss: 0.8875771412568934
+validation rmse: 0.13006753151956
+epoch:  48
+training loss:  0.9851560958115964
+validation loss: 0.8856200946359073
+validation rmse: 0.12992405682565142
+epoch:  49
+training loss:  0.9856667448228563
+validation loss: 0.8875797982496374
+validation rmse: 0.1300677247733922
+epoch:  50
+training loss:  0.9840458168294426
+validation loss: 0.8858171018151676
+validation rmse: 0.12993850383606081
+epoch:  51
+training loss:  0.9854876083482553
+validation loss: 0.8856481318754308
+validation rmse: 0.12992611385211114
+epoch:  52
+training loss:  0.9853867406744343
+validation loss: 0.8857930362364825
+validation rmse: 0.12993674093797605
+epoch:  53
+training loss:  0.9827991331242709
+validation loss: 0.8844437693708084
+validation rmse: 0.12983774013372862
+epoch:  54
+training loss:  0.982856136040797
+validation loss: 0.8849775291611166
+validation rmse: 0.12987691226263706
+epoch:  55
+training loss:  0.9839245012056989
+validation loss: 0.8864678024123697
+validation rmse: 0.1299862219893158
+epoch:  56
+training loss:  0.9829366732688574
+validation loss: 0.8863644112979665
+validation rmse: 0.1299786438191957
+epoch:  57
+training loss:  0.982376539892971
+validation loss: 0.885815845377305
+validation rmse: 0.12993841601923334
+epoch:  58
+training loss:  0.9828380255274964
+validation loss: 0.8857096666728749
+validation rmse: 0.12993062716990134
+epoch:  59
+training loss:  0.9830544248615297
+validation loss: 0.8840845230887918
+validation rmse: 0.12981137211298913
+epoch:  60
+training loss:  0.9817590501529017
+validation loss: 0.8844746630051556
+validation rmse: 0.12984000834292714
+epoch:  61
+training loss:  0.9807385025890507
+validation loss: 0.8827148974362542
+validation rmse: 0.12971078034139458
+epoch:  62
+training loss:  0.9805155834588825
+validation loss: 0.8840042184941909
+validation rmse: 0.1298054759212704
+epoch:  63
+training loss:  0.9810440329900378
+validation loss: 0.8836091586281272
+validation rmse: 0.12977646753996575
+epoch:  64
+training loss:  0.9812166737740798
+validation loss: 0.8840262447805965
+validation rmse: 0.12980709325981177
+epoch:  65
+training loss:  0.9797151173815107
+validation loss: 0.8848279598460478
+validation rmse: 0.1298659407410239
+epoch:  66
+training loss:  0.9803598017181588
+validation loss: 0.8838453517801621
+validation rmse: 0.1297938112837602
+epoch:  67
+training loss:  0.9786281701748007
+validation loss: 0.8845171139941496
+validation rmse: 0.12984312857846877
+epoch:  68
+training loss:  0.9793878433987546
+validation loss: 0.8846900673473582
+validation rmse: 0.1298558200928556
+epoch:  69
+training loss:  0.9790472592259356
+validation loss: 0.8844112646159004
+validation rmse: 0.12983535803681764
+epoch:  70
+training loss:  0.9794194446554694
+validation loss: 0.8838879894368789
+validation rmse: 0.12979694060532632
+epoch:  71
+training loss:  0.97854391127711
+validation loss: 0.8854392303298502
+validation rmse: 0.129910790626799
+early stopping because val loss not decrease for 10 epoch

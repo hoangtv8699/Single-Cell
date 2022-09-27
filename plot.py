@@ -1,5 +1,5 @@
-from utils import *
-
+# from utils import *
+#
 # path = 'logs/24_09_2022 18_08_14.log'
 #
 # classification_train_loss, classification_val_loss, embed_train_loss, embed_test_loss, \
@@ -102,7 +102,7 @@ mod1 = train_mod1.var['feature_types'][0]
 mod2 = train_mod2.var['feature_types'][0]
 
 # log norm train mod1
-sc.pp.log1p(train_mod1)
+# sc.pp.log1p(train_mod2)
 
 # get input and encode label for classification training
 LE = LabelEncoder()
@@ -115,6 +115,6 @@ mod1_train, _, mod2_train, _, label_train, label_val = train_test_split(train_mo
                                                                         stratify=input_label)
 
 mod1_train, mod1_reducer = embedding(mod1_train, args1.input_feats, random_seed=args1.random_seed)
-pk.dump(mod1_reducer, open(f'pretrain/{mod1} reducer.pkl', "wb"))
+pk.dump(mod1_reducer, open(f'pretrain/{mod1} reducer multiome nolog.pkl', "wb"))
 mod2_train, mod2_reducer = embedding(mod2_train, args2.input_feats, random_seed=args2.random_seed)
-pk.dump(mod2_reducer, open(f'pretrain/{mod2} reducer.pkl', "wb"))
+pk.dump(mod2_reducer, open(f'pretrain/{mod2} reducer multiome nolog.pkl', "wb"))

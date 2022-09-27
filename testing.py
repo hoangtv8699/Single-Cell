@@ -17,6 +17,7 @@ from argparse import Namespace
 from torch.utils.data import DataLoader
 from datetime import datetime
 from os.path import exists
+from scipy.sparse import csc_matrix
 
 from utils import *
 
@@ -29,14 +30,14 @@ param = {
     'use_pretrained': True,
     'input_test_mod1': f'{dataset_path}gex.h5ad',
     'input_test_mod2': f'{dataset_path}atac.h5ad',
-    'subset_pretrain1': f'{pretrain_path}GEX_subset.pkl',
-    'subset_pretrain2': f'{pretrain_path}ATAC_subset.pkl',
+    'subset_pretrain1': f'{pretrain_path}GEX reducer.pkl',
+    'subset_pretrain2': f'{pretrain_path}ATAC reducer.pkl',
     'output_pretrain': 'pretrain/',
     'save_model_path': 'saved_model/',
     'logs_path': 'logs/'
 }
 
-time_train = '26_09_2022 02_08_15'
+time_train = '27_09_2022 09_15_57 mod'
 
 # if load args
 args = pk.load(open(f'{param["save_model_path"]}{time_train}/args net2.pkl', 'rb'))
@@ -46,15 +47,20 @@ test_mod1 = sc.read_h5ad(param['input_test_mod1'])
 test_mod2 = sc.read_h5ad(param['input_test_mod2'])
 
 # select feature
-if param['use_pretrained']:
-    subset1 = pk.load(open(param['subset_pretrain1'], 'rb'))
-    subset2 = pk.load(open(param['subset_pretrain2'], 'rb'))
+mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
+mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
-params = {'batch_size': 2,
+params = {'batch_size': 2000,
           'shuffle': False,
           'num_workers': 0}
-# val_set = ModalityDataset(test_mod1[:, list(subset1)].X, test_mod2.X, types='2mod')
-val_set = ModalityDataset(test_mod2.X, test_mod1.X, types='2mod')
+
+# log norm train mod1
+sc.pp.log1p(test_mod2)
+
+input = csc_matrix(mod2_reducer.transform(test_mod2.X))
+label = csc_matrix(mod1_reducer.transform(test_mod1.X))
+
+val_set = ModalityDataset(input, label, types='2mod')
 val_loader = DataLoader(val_set, **params)
 
 # args.act_out = 's'
@@ -71,7 +77,9 @@ with torch.no_grad():
         print(i)
         val_batch, label = val_batch.cuda(), label.cuda()
         out = net(val_batch, residual=True, types='predict')
-        rmse += mean_squared_error(label.detach().cpu().numpy(), out.detach().cpu().numpy()) * val_batch.size(0)
+        out_ori = mod2_reducer.inverse_transform(out.detach().cpu().numpy())
+        label_ori = mod2_reducer.inverse_transform(label.detach().cpu().numpy())
+        rmse += mean_squared_error(label_ori, out_ori) * val_batch.size(0)
         i += 1
 
 rmse = math.sqrt(rmse / len(val_loader.dataset))

@@ -20,27 +20,27 @@ from utils import *
 
 device = torch.device("cuda:0")
 
-dataset_path = 'data/train/multiome/'
+dataset_path = 'data/train/cite/'
 pretrain_path = 'pretrain/'
 
 param = {
     'use_pretrained': True,
-    'input_train_mod1': f'{dataset_path}gex.h5ad',
-    'input_train_mod2': f'{dataset_path}atac.h5ad',
-    'subset_pretrain1': f'{pretrain_path}GEX reducer.pkl',
-    'subset_pretrain2': f'{pretrain_path}ATAC reducer.pkl',
+    'input_train_mod1': f'{dataset_path}adt.h5ad',
+    'input_train_mod2': f'{dataset_path}gex.h5ad',
+    'subset_pretrain1': f'{pretrain_path}ADT reducer cite.pkl',
+    'subset_pretrain2': f'{pretrain_path}GEX reducer cite.pkl',
     'output_pretrain': 'pretrain/',
     'save_model_path': 'saved_model/',
     'logs_path': 'logs/'
 }
 
 args1 = Namespace(
-    input_feats=256,
+    input_feats=134,
     num_class=22,
-    embed_hid_feats=512,
+    embed_hid_feats=256,
     latent_feats=64,
-    class_hid_feats=512,
-    pred_hid_feats=512,
+    class_hid_feats=256,
+    pred_hid_feats=256,
     out_feats=256,
     random_seed=17,
     activation='relu',
@@ -81,9 +81,9 @@ args2 = Namespace(
 )
 
 now = datetime.now()
-time_train = now.strftime("%d_%m_%Y %H_%M_%S")
-# time_train = '27_09_2022 09_15_57 mod'
-os.mkdir(f'{param["save_model_path"]}{time_train}')
+# time_train = now.strftime("%d_%m_%Y %H_%M_%S")
+time_train = '27_09_2022 18_18_45'
+# os.mkdir(f'{param["save_model_path"]}{time_train}')
 logger = open(f'{param["logs_path"]}{time_train}.log', 'a')
 
 # get feature type
@@ -99,17 +99,18 @@ train_mod1.obs["class_label"] = LE.fit_transform(train_mod1.obs["cell_type"])
 input_label = train_mod1.obs["class_label"].to_numpy()
 logger.write('class name: ' + str(LE.classes_) + '\n')
 
-mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
+# mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
 mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
 # log norm train mod1
-sc.pp.log1p(train_mod1)
+# sc.pp.log1p(train_mod1)
+sc.pp.log1p(train_mod2)
 
 # net1 input and output
-net1_input = csc_matrix(mod1_reducer.transform(train_mod1.X))
+net1_input = train_mod1.X
 net1_output = csc_matrix(mod2_reducer.transform(train_mod2.X))
 net2_input = csc_matrix(mod2_reducer.transform(train_mod2.X))
-net2_output = csc_matrix(mod1_reducer.transform(train_mod1.X))
+net2_output = train_mod1.X
 
 # # if not using reducer
 # net1_input = train_mod1.X
@@ -164,42 +165,42 @@ params = {'batch_size': 256,
           'shuffle': True,
           'num_workers': 0}
 
-# train model to classification
-training_set1 = ModalityDataset2(net1_input_train, label_train, types='classification')
-training_set2 = ModalityDataset2(net2_input_train, label_train, types='classification')
-val_set1 = ModalityDataset2(net1_input_val, label_val, types='classification')
-val_set2 = ModalityDataset2(net2_input_val, label_val, types='classification')
-
-train_loader1 = DataLoader(training_set1, **params)
-train_loader2 = DataLoader(training_set2, **params)
-val_loader1 = DataLoader(val_set1, **params)
-val_loader2 = DataLoader(val_set2, **params)
-
-best_state_dict1 = train_classification(train_loader1, val_loader1, net1, args1, logger)
-torch.save(best_state_dict1,
-           f'{param["save_model_path"]}{time_train}/model {mod1} param classification.pkl')
-
-best_state_dict2 = train_classification(train_loader2, val_loader2, net2, args2, logger)
-torch.save(best_state_dict2,
-           f'{param["save_model_path"]}{time_train}/model {mod2} param classification.pkl')
-
-# load pretrained from dir
-net1.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod1} param classification.pkl'))
-net2.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod2} param classification.pkl'))
-
-# train model by contrastive
-training_set = ModalityDataset2(net1_input_train, net2_input_train, types='2mod')
-val_set = ModalityDataset2(net1_input_val, net2_input_val, types='2mod')
-
-train_loader = DataLoader(training_set, **params)
-val_loader = DataLoader(val_set, **params)
-
-best_state_dict1, best_state_dict2 = train_contrastive(train_loader, val_loader, net1, net2, args1, logger)
-
-torch.save(best_state_dict1,
-           f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl')
-torch.save(best_state_dict2,
-           f'{param["save_model_path"]}{time_train}/model {mod2} param contrastive.pkl')
+# # train model to classification
+# training_set1 = ModalityDataset2(net1_input_train, label_train, types='classification')
+# training_set2 = ModalityDataset2(net2_input_train, label_train, types='classification')
+# val_set1 = ModalityDataset2(net1_input_val, label_val, types='classification')
+# val_set2 = ModalityDataset2(net2_input_val, label_val, types='classification')
+#
+# train_loader1 = DataLoader(training_set1, **params)
+# train_loader2 = DataLoader(training_set2, **params)
+# val_loader1 = DataLoader(val_set1, **params)
+# val_loader2 = DataLoader(val_set2, **params)
+#
+# best_state_dict1 = train_classification(train_loader1, val_loader1, net1, args1, logger)
+# torch.save(best_state_dict1,
+#            f'{param["save_model_path"]}{time_train}/model {mod1} param classification.pkl')
+#
+# best_state_dict2 = train_classification(train_loader2, val_loader2, net2, args2, logger)
+# torch.save(best_state_dict2,
+#            f'{param["save_model_path"]}{time_train}/model {mod2} param classification.pkl')
+#
+# # load pretrained from dir
+# net1.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod1} param classification.pkl'))
+# net2.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod2} param classification.pkl'))
+#
+# # train model by contrastive
+# training_set = ModalityDataset2(net1_input_train, net2_input_train, types='2mod')
+# val_set = ModalityDataset2(net1_input_val, net2_input_val, types='2mod')
+#
+# train_loader = DataLoader(training_set, **params)
+# val_loader = DataLoader(val_set, **params)
+#
+# best_state_dict1, best_state_dict2 = train_contrastive(train_loader, val_loader, net1, net2, args1, logger)
+#
+# torch.save(best_state_dict1,
+#            f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl')
+# torch.save(best_state_dict2,
+#            f'{param["save_model_path"]}{time_train}/model {mod2} param contrastive.pkl')
 
 # load pretrained from dir
 net1.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl'))
@@ -220,6 +221,6 @@ best_state_dict1 = train_predict(train_loader1, val_loader1, net1, args1, logger
 torch.save(best_state_dict1,
            f'{param["save_model_path"]}{time_train}/model {mod1} param predict.pkl')
 
-best_state_dict2 = train_predict(train_loader2, val_loader2, net2, args2, logger, mod1_reducer)
+best_state_dict2 = train_predict(train_loader2, val_loader2, net2, args2, logger, mod_reducer=None)
 torch.save(best_state_dict2,
            f'{param["save_model_path"]}{time_train}/model {mod2} param predict.pkl')

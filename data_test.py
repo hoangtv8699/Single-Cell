@@ -4,17 +4,19 @@ import pickle as pk
 
 raw_path = 'data/multiome_BMMC_processed/raw.h5ad'
 processed_path = 'data/explore/multiome/multiome_gex_processed_training.h5ad'
-train_path = 'data/train/multiome/gex.h5ad'
+train_path = 'data/train/cite/adt.h5ad'
 
-raw = sc.read_h5ad(raw_path)
-processed = sc.read_h5ad(processed_path)
+# raw = sc.read_h5ad(raw_path)
+# processed = sc.read_h5ad(processed_path)
 train = sc.read_h5ad(train_path)
 
-pretrain_path = 'pretrain/'
+# pretrain_path = 'pretrain/'
 
-print(train.X[0])
+print(train.X.max())
+print(train.X.min())
 sc.pp.log1p(train)
-print(train.X[0])
+print(train.X.max())
+print(train.X.min())
 
 
 
