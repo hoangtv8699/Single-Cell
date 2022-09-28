@@ -26,8 +26,8 @@ param = {
     'use_pretrained': True,
     'input_train_mod1': f'{dataset_path}gex.h5ad',
     'input_train_mod2': f'{dataset_path}atac.h5ad',
-    'subset_pretrain1': f'{pretrain_path}GEX reducer multiome nolog.pkl',
-    'subset_pretrain2': f'{pretrain_path}ATAC reducer multiome nolog.pkl',
+    'subset_pretrain1': f'{pretrain_path}GEX reducer.pkl',
+    'subset_pretrain2': f'{pretrain_path}ATAC reducer.pkl',
     'output_pretrain': 'pretrain/',
     'save_model_path': 'saved_model/',
     'logs_path': 'logs/'
