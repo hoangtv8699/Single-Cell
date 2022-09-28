@@ -74,7 +74,7 @@ def read_logs(path):
                     predict_test_loss2.append(float(line[2]))
             i += 1
 
-        return classification_train_loss1, classification_val_loss1, classification_train_loss2, classification_val_loss2,\
+        return classification_train_loss1, classification_val_loss1, classification_train_loss2, classification_val_loss2, \
                embed_train_loss, embed_test_loss, predict_train_loss1, predict_test_loss1, predict_train_loss2, predict_test_loss2
 
 
@@ -106,6 +106,7 @@ def validate(model, graph, labels, type='x2x', residual=True):
 def calculate_rmse(mod, mod_answer):
     from sklearn.metrics import mean_squared_error
     return mean_squared_error(mod, mod_answer, squared=False)
+
 
 #
 # class GCNlayer(nn.Module):
@@ -851,6 +852,7 @@ class ResidualBlock(nn.Module):
         x = self.dropout(x)
 
         return x
+
 
 class Nonelayer(nn.Module):
     def __init__(self):
