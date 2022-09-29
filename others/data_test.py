@@ -3,9 +3,9 @@ import scanpy as sc
 import pickle as pk
 from scipy.sparse import csc_matrix
 
-raw_path = 'data/multiome_BMMC_processed/raw.h5ad'
-processed_path = 'data/explore/multiome/multiome_gex_processed_training.h5ad'
-train_path = 'data/train/cite/gex.h5ad'
+raw_path = '../data/multiome_BMMC_processed/raw.h5ad'
+processed_path = '../data/explore/multiome/multiome_gex_processed_training.h5ad'
+train_path = '../data/train/cite/gex.h5ad'
 
 reducer_path = 'pretrain/GEX reducer cite nolog.pkl'
 

@@ -14,7 +14,7 @@ from datetime import datetime
 
 from utils import *
 
-dataset_path = 'data/cite_BMMC_processed/'
+dataset_path = '../data/cite_BMMC_processed/'
 pretrain_path = 'pretrain/cite_BMMC_processed/'
 
 param = {

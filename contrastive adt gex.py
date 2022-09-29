@@ -102,7 +102,6 @@ mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
 mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
 # log norm train mod1
-# sc.pp.log1p(train_mod1)
 sc.pp.log1p(train_mod2)
 
 # net1 input and output

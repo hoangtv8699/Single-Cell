@@ -19,7 +19,7 @@ from utils import *
 
 device = torch.device("cuda:0")
 
-dataset_path = 'data/explore/multiome/'
+dataset_path = '../data/explore/multiome/'
 
 param = {
     'input_train_mod': f'{dataset_path}multiome_gex_processed_training.h5ad',

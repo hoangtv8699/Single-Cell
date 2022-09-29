@@ -39,8 +39,8 @@ def embedding(mod, n_components, random_seed=0):
     return truncated_mod, mod_reducer
 
 
-dataset_path = 'data/train/cite/'
-pretrain_path = 'pretrain/'
+dataset_path = '../data/train/cite/'
+pretrain_path = '../pretrain/'
 
 param = {
     'use_pretrained': True,
