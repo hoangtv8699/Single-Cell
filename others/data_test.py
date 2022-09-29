@@ -21,17 +21,17 @@ for folder in folders:
     train_mod2 = sc.read_h5ad(f'{path+folder}train_mod2.h5ad')
 
     if folder == 'adt2gex/':
-        mod1_train, mod1_reducer = embedding(train_mod1, 64, random_seed=17)
+        mod1_train, mod1_reducer = embedding(train_mod1.X, 64, random_seed=17)
         pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
-        mod2_train, mod2_reducer = embedding(train_mod2, 256, random_seed=17)
+        mod2_train, mod2_reducer = embedding(train_mod2.X, 256, random_seed=17)
         pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
     elif folder == 'gex2adt/':
-        mod1_train, mod1_reducer = embedding(train_mod1, 256, random_seed=17)
+        mod1_train, mod1_reducer = embedding(train_mod1.X, 256, random_seed=17)
         pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
-        mod2_train, mod2_reducer = embedding(train_mod2, 64, random_seed=17)
+        mod2_train, mod2_reducer = embedding(train_mod2.X, 64, random_seed=17)
         pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
     else:
-        mod1_train, mod1_reducer = embedding(train_mod1, 256, random_seed=17)
+        mod1_train, mod1_reducer = embedding(train_mod1.X, 256, random_seed=17)
         pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
-        mod2_train, mod2_reducer = embedding(train_mod2, 256, random_seed=17)
+        mod2_train, mod2_reducer = embedding(train_mod2.X, 256, random_seed=17)
         pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
