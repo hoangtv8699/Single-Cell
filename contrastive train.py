@@ -12,8 +12,8 @@ from utils import *
 
 device = torch.device("cuda:0")
 
-dataset_path = '../data/paper data/adt2gex/'
-pretrain_path = '../pretrain/paper data/adt2gex'
+dataset_path = 'data/paper data/adt2gex/'
+pretrain_path = 'pretrain/paper data/adt2gex'
 
 param = {
     'use_pretrained': True,

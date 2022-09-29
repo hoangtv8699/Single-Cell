@@ -7,13 +7,13 @@ from utils import *
 
 # device = torch.device("cuda:0")
 
-dataset_path = '../data/paper data/adt2gex/'
-pretrain_path = '../pretrain/paper data/adt2gex'
+dataset_path = 'data/paper data/adt2gex/'
+pretrain_path = 'pretrain/paper data/adt2gex'
 
 param = {
     'use_pretrained': True,
-    'input_train_mod1': f'{dataset_path}test_mod1.h5ad',
-    'input_train_mod2': f'{dataset_path}test_mod2.h5ad',
+    'input_test_mod1': f'{dataset_path}test_mod1.h5ad',
+    'input_test_mod2': f'{dataset_path}test_mod2.h5ad',
     'subset_pretrain1': f'{pretrain_path}mod1 reducer.pkl',
     'subset_pretrain2': f'{pretrain_path}mod2 reducer.pkl',
     'output_pretrain': '../pretrain/',
