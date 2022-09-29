@@ -26,7 +26,7 @@ param = {
     'use_pretrained': True,
     'input_train_mod1': f'{dataset_path}adt.h5ad',
     'input_train_mod2': f'{dataset_path}gex.h5ad',
-    'subset_pretrain1': f'{pretrain_path}ADT reducer cite nolog.pkl',
+    'subset_pretrain1': f'{pretrain_path}ADT reducer cite 64.pkl',
     'subset_pretrain2': f'{pretrain_path}GEX reducer cite.pkl',
     'output_pretrain': 'pretrain/',
     'save_model_path': 'saved_model/',
@@ -34,7 +34,7 @@ param = {
 }
 
 args1 = Namespace(
-    input_feats=32,
+    input_feats=64,
     num_class=22,
     embed_hid_feats=512,
     latent_feats=64,

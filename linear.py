@@ -134,8 +134,8 @@ train_mod2 = sc.read_h5ad(param['input_train_mod2'])
 mod1 = train_mod1.var['feature_types'][0]
 mod2 = train_mod2.var['feature_types'][0]
 
-mod1_reducer = pk.load(open('pretrain/GEX reducer.pkl', "rb"))
-mod2_reducer = pk.load(open('pretrain/ATAC reducer.pkl', "rb"))
+mod1_reducer = pk.load(open('pretrain/GEX reducer multiome.pkl', "rb"))
+mod2_reducer = pk.load(open('pretrain/ATAC reducer multiome.pkl', "rb"))
 
 input_train_mod1_reduced = csc_matrix(mod1_reducer.transform(train_mod1.X))
 input_train_mod2_reduced = csc_matrix(mod2_reducer.transform(train_mod2.X))
