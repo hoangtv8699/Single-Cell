@@ -15,6 +15,7 @@ from sklearn.preprocessing import normalize, LabelEncoder
 from sklearn.metrics import precision_score, accuracy_score, classification_report, mean_squared_error
 from pytorch_metric_learning import losses
 from matplotlib import pyplot as plt
+from scipy.stats import pearsonr
 
 
 def plot_loss(train_loss, val_loss):
@@ -984,3 +985,12 @@ class LinearRegressionModel(torch.nn.Module):
     def forward(self, x):
         y_pred = self.linear(x)
         return y_pred
+
+
+def pearson(y_true, y_pred):
+    pearson_arr = []
+    for y, x in zip(y_true, y_pred):
+        r, _ = pearsonr(y, x)
+        pearson_arr.append(r)
+    return np.mean(pearson_arr)
+

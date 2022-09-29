@@ -37,7 +37,7 @@ param = {
     'logs_path': 'logs/'
 }
 
-time_train = '28_09_2022 07_38_01no act_out'
+time_train = '29_09_2022 19_06_18no act_out'
 
 # if load args
 args = pk.load(open(f'{param["save_model_path"]}{time_train}/args net2.pkl', 'rb'))
@@ -71,6 +71,7 @@ net.cuda()
 net.eval()
 
 rmse = 0
+pear = 0
 i = 0
 with torch.no_grad():
     for val_batch, label in val_loader:
@@ -80,8 +81,11 @@ with torch.no_grad():
         out_ori = mod1_reducer.inverse_transform(out.detach().cpu().numpy())
         label_ori = mod1_reducer.inverse_transform(label.detach().cpu().numpy())
         rmse += mean_squared_error(label_ori, out_ori) * val_batch.size(0)
+        pear += pearson(label_ori, out_ori) * val_batch.size(0)
         i += 1
 
 rmse = math.sqrt(rmse / len(val_loader.dataset))
+pear = math.sqrt(pear / len(val_loader.dataset))
 print(rmse)
+print(pear)
 
