@@ -735,9 +735,10 @@ def train_contrastive(train_loader, val_loader, net1, net2, args1, logger):
 def train_predict(train_loader, val_loader, net, args, logger, mod_reducer):
     print('train predict')
     net.cuda()
-    net_param = []
-    net_param.extend(net.predict.parameters())
-    opt = torch.optim.Adam(net_param, args.lr_predict)
+    # net_param = []
+    # net_param.extend(net.predict.parameters())
+    # opt = torch.optim.Adam(net_param, args.lr_predict)
+    opt = torch.optim.Adam(net.parameters(), args.lr_predict)
 
     training_loss = []
     val_loss = []
