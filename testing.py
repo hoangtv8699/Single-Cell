@@ -37,7 +37,7 @@ param = {
     'logs_path': 'logs/'
 }
 
-time_train = '27_09_2022 09_15_57 mod'
+time_train = '28_09_2022 07_38_01no act_out'
 
 # if load args
 args = pk.load(open(f'{param["save_model_path"]}{time_train}/args net2.pkl', 'rb'))
@@ -55,7 +55,7 @@ params = {'batch_size': 2000,
           'num_workers': 0}
 
 # log norm train mod1
-sc.pp.log1p(test_mod2)
+sc.pp.log1p(test_mod1)
 
 input = csc_matrix(mod2_reducer.transform(test_mod2.X))
 label = csc_matrix(mod1_reducer.transform(test_mod1.X))
@@ -77,8 +77,8 @@ with torch.no_grad():
         print(i)
         val_batch, label = val_batch.cuda(), label.cuda()
         out = net(val_batch, residual=True, types='predict')
-        out_ori = mod2_reducer.inverse_transform(out.detach().cpu().numpy())
-        label_ori = mod2_reducer.inverse_transform(label.detach().cpu().numpy())
+        out_ori = mod1_reducer.inverse_transform(out.detach().cpu().numpy())
+        label_ori = mod1_reducer.inverse_transform(label.detach().cpu().numpy())
         rmse += mean_squared_error(label_ori, out_ori) * val_batch.size(0)
         i += 1
 
