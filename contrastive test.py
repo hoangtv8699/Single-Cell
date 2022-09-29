@@ -16,9 +16,9 @@ param = {
     'input_test_mod2': f'{dataset_path}test_mod2.h5ad',
     'subset_pretrain1': f'{pretrain_path}mod1 reducer.pkl',
     'subset_pretrain2': f'{pretrain_path}mod2 reducer.pkl',
-    'output_pretrain': '../pretrain/',
-    'save_model_path': '../saved_model/',
-    'logs_path': '../logs/'
+    'output_pretrain': 'pretrain/',
+    'save_model_path': 'saved_model/',
+    'logs_path': 'logs/'
 }
 
 mod1 = 'adt'
