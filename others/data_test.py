@@ -19,6 +19,7 @@ path_pretrain = '../pretrain/paper data/'
 for folder in folders:
     train_mod1 = sc.read_h5ad(f'{path+folder}train_mod1.h5ad')
     train_mod2 = sc.read_h5ad(f'{path+folder}train_mod2.h5ad')
+    print('go')
 
     if folder == 'adt2gex/':
         mod1_train, mod1_reducer = embedding(train_mod1.X, 64, random_seed=17)
