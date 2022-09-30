@@ -7,24 +7,24 @@ from utils import *
 
 # device = torch.device("cuda:0")
 
-dataset_path = 'data/paper data/adt2gex/'
-pretrain_path = 'pretrain/paper data/adt2gex/'
+dataset_path = 'data/paper data/gex2adt/'
+pretrain_path = 'pretrain/paper data/gex2adt/'
 
 param = {
     'use_pretrained': True,
     'input_test_mod1': f'{dataset_path}test_mod1.h5ad',
     'input_test_mod2': f'{dataset_path}test_mod2.h5ad',
     'subset_pretrain1': f'{pretrain_path}mod1 reducer.pkl',
-    'subset_pretrain2': f'{pretrain_path}mod2 reducer.pkl',
+    'subset_pretrain2': f'{pretrain_path}mod2 reducer 32.pkl',
     'output_pretrain': 'pretrain/',
     'save_model_path': 'saved_model/',
     'logs_path': 'logs/'
 }
 
-mod1 = 'adt'
-mod2 = 'gex'
+mod1 = 'gex'
+mod2 = 'adt'
 
-time_train = '30_09_2022 03_55_26adt to gex paper data'
+time_train = '30_09_2022 13_05_14gex to adt paper data freeze embed'
 
 # if load args
 args1 = pk.load(open(f'{param["save_model_path"]}{time_train}/args net1.pkl', 'rb'))
