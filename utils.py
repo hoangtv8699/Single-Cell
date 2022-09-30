@@ -680,8 +680,8 @@ def train_contrastive(train_loader, val_loader, net1, net2, args1, logger):
             out2 = net2(mod2_batch, residual=True, types='embed')
 
             out = torch.cat((out1, out2))
-            indices = torch.arange(0, out1.size(0), device=out1.device)
-            labels = torch.cat((indices, indices))
+            indices = torch.arange(0, out1.size(0) * 2, device=out1.device)
+            labels = torch.cat((indices[out1.size(0):], indices[:out1.size(0)]))
 
             loss = criterion(out, labels)
             running_loss += loss.item() * mod1_batch.size(0)
