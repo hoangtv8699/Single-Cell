@@ -8,7 +8,7 @@ from utils import *
 # device = torch.device("cuda:0")
 
 dataset_path = 'data/paper data/adt2gex/'
-pretrain_path = 'pretrain/paper data/adt2gex'
+pretrain_path = 'pretrain/paper data/adt2gex/'
 
 param = {
     'use_pretrained': True,
@@ -24,7 +24,7 @@ param = {
 mod1 = 'adt'
 mod2 = 'gex'
 
-time_train = '29_09_2022 19_06_18no act_out'
+time_train = '30_09_2022 03_55_26adt to gex paper data'
 
 # if load args
 args1 = pk.load(open(f'{param["save_model_path"]}{time_train}/args net1.pkl', 'rb'))
@@ -59,17 +59,14 @@ net.eval()
 
 rmse = 0
 pear = 0
-i = 0
 with torch.no_grad():
     for val_batch, label in val_loader:
-        print(i)
         val_batch, label = val_batch.cuda(), label.cuda()
         out = net(val_batch, residual=True, types='predict')
         out_ori = mod2_reducer.inverse_transform(out.detach().cpu().numpy())
         label_ori = mod2_reducer.inverse_transform(label.detach().cpu().numpy())
         rmse += mean_squared_error(label_ori, out_ori) * val_batch.size(0)
         pear += pearson(label_ori, out_ori) * val_batch.size(0)
-        i += 1
 
 rmse = math.sqrt(rmse / len(val_loader.dataset))
 pear = math.sqrt(pear / len(val_loader.dataset))

@@ -12,8 +12,8 @@ from utils import *
 
 device = torch.device("cuda:0")
 
-dataset_path = 'data/paper data/adt2gex/'
-pretrain_path = 'pretrain/paper data/adt2gex'
+dataset_path = 'data/paper data/atac2gex/'
+pretrain_path = 'pretrain/paper data/atac2gex/'
 
 param = {
     'use_pretrained': True,
@@ -75,7 +75,7 @@ args2 = Namespace(
 # get feature type
 train_mod1 = sc.read_h5ad(param['input_train_mod1'])
 train_mod2 = sc.read_h5ad(param['input_train_mod2'])
-mod1 = 'adt'
+mod1 = 'atac'
 mod2 = 'gex'
 
 now = datetime.now()

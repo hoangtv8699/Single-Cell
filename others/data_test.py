@@ -12,27 +12,34 @@ def embedding(mod, n_components, random_seed=0):
     return truncated_mod, mod_reducer
 
 
-path = '../data/paper data/'
-folders = ['adt2gex/', 'gex2adt/', 'atac2gex/', 'gex2atac/']
-path_pretrain = '../pretrain/paper data/'
+# path = '../data/paper data/'
+# folders = ['adt2gex/', 'gex2adt/', 'atac2gex/', 'gex2atac/']
+# path_pretrain = '../pretrain/paper data/'
+#
+# for folder in folders:
+#     train_mod1 = sc.read_h5ad(f'{path+folder}train_mod1.h5ad')
+#     train_mod2 = sc.read_h5ad(f'{path+folder}train_mod2.h5ad')
+#     print('go')
+#
+#     if folder == 'adt2gex/':
+#         mod1_train, mod1_reducer = embedding(train_mod1.X, 64, random_seed=17)
+#         pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
+#         mod2_train, mod2_reducer = embedding(train_mod2.X, 256, random_seed=17)
+#         pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
+#     elif folder == 'gex2adt/':
+#         mod1_train, mod1_reducer = embedding(train_mod1.X, 256, random_seed=17)
+#         pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
+#         mod2_train, mod2_reducer = embedding(train_mod2.X, 64, random_seed=17)
+#         pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
+#     else:
+#         mod1_train, mod1_reducer = embedding(train_mod1.X, 256, random_seed=17)
+#         pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
+#         mod2_train, mod2_reducer = embedding(train_mod2.X, 256, random_seed=17)
+#         pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
 
-for folder in folders:
-    train_mod1 = sc.read_h5ad(f'{path+folder}train_mod1.h5ad')
-    train_mod2 = sc.read_h5ad(f'{path+folder}train_mod2.h5ad')
-    print('go')
+path = '../data/paper data/gex2adt/test_mod1.h5ad'
+train = sc.read_h5ad(path)
 
-    if folder == 'adt2gex/':
-        mod1_train, mod1_reducer = embedding(train_mod1.X, 64, random_seed=17)
-        pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
-        mod2_train, mod2_reducer = embedding(train_mod2.X, 256, random_seed=17)
-        pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
-    elif folder == 'gex2adt/':
-        mod1_train, mod1_reducer = embedding(train_mod1.X, 256, random_seed=17)
-        pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
-        mod2_train, mod2_reducer = embedding(train_mod2.X, 64, random_seed=17)
-        pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
-    else:
-        mod1_train, mod1_reducer = embedding(train_mod1.X, 256, random_seed=17)
-        pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
-        mod2_train, mod2_reducer = embedding(train_mod2.X, 256, random_seed=17)
-        pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
+print(train)
+print(train.X.max())
+print(train.X.min())
