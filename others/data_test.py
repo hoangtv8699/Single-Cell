@@ -38,18 +38,9 @@ def embedding(mod, n_components, random_seed=0):
 #     #     mod2_train, mod2_reducer = embedding(train_mod2.X, 256, random_seed=17)
 #     #     pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
 
-# path = '../data/paper data/gex2adt/test_mod1.h5ad'
-# train = sc.read_h5ad(path)
-#
-# print(train)
-# print(train.X.max())
-# print(train.X.min())
+path = '../data/paper data/gex2atac/test_mod1.h5ad'
+train = sc.read_h5ad(path)
 
-out1 = torch.zeros(4, 5)
-out2 = torch.zeros(4, 5)
-
-out = torch.cat((out1, out2))
-indices = torch.arange(0, out1.size(0) * 2, device=out1.device)
-labels = torch.cat((indices[out1.size(0):], indices[:out1.size(0)]))
-
-print('a')
+print(train)
+print(train.X.max())
+print(train.X.min())
