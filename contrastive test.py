@@ -43,7 +43,7 @@ params = {'batch_size': 2000,
           'num_workers': 0}
 
 # test model mod 1
-input = csc_matrix(mod1_reducer.transform(test_mod1.X))
+input = test_mod1.X
 labels = test_mod2.X
 
 val_set = ModalityDataset(input, labels, types='2mod')
@@ -60,11 +60,7 @@ with torch.no_grad():
     for val_batch, label in val_loader:
         val_batch, label = val_batch.cuda(), label.cuda()
         out = net(val_batch, residual=True, types='predict')
-        out_ori = mod2_reducer.inverse_transform(out.detach().cpu().numpy())
-        rmse += mean_squared_error(label.detach().cpu().numpy(), out_ori) * val_batch.size(0)
-        pear += pearson(label.detach().cpu().numpy(), out_ori) * val_batch.size(0)
+        rmse += mean_squared_error(label.detach().cpu().numpy(), out.detach().cpu().numpy()) * val_batch.size(0)
 
 rmse = math.sqrt(rmse / len(val_loader.dataset))
-pear = math.sqrt(pear / len(val_loader.dataset))
 print(rmse)
-print(pear)

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import scanpy as sc
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as f
 from matplotlib import pyplot as plt
 from pytorch_metric_learning import losses
 from scipy.stats import pearsonr
@@ -89,7 +89,7 @@ def validate(model, graph, labels, type='x2x', residual=True):
     model.eval()
     with torch.no_grad():
         out = model(graph, labels, type, residual)
-        loss = F.mse_loss(out, labels)
+        loss = f.mse_loss(out, labels)
         return loss
 
 
@@ -172,6 +172,7 @@ class ModalityDataset2(Dataset):
             y = torch.tensor(self.adata2.X[idx].toarray()[0]).float()
 
         return X, y
+
 
 # ranking feature
 def analysis_features(adata, method='wilcoxon', top=100):
@@ -358,52 +359,6 @@ def train_predict(train_loader, val_loader, net, args, logger, mod_reducer):
     return best_state_dict
 
 
-class ResidualBlock(nn.Module):
-    def __init__(self, input_feats, activation, normalization, dropout):
-        super().__init__()
-        self.layers = nn.ModuleList()
-        self.acts = nn.ModuleList()
-        self.norms = nn.ModuleList()
-        self.dropout = nn.Dropout(dropout)
-
-        self.layers.append(nn.Linear(input_feats, input_feats))
-        self.layers.append(nn.Linear(input_feats, input_feats))
-
-        if activation == 'gelu':
-            self.acts.append(nn.GELU())
-            self.acts.append(nn.GELU())
-        elif activation == 'prelu':
-            self.acts.append(nn.PReLU())
-            self.acts.append(nn.PReLU())
-        elif activation == 'relu':
-            self.acts.append(nn.ReLU())
-            self.acts.append(nn.ReLU())
-        elif activation == 'leaky_relu':
-            self.acts.append(nn.LeakyReLU())
-            self.acts.append(nn.LeakyReLU())
-
-        if normalization == 'batch':
-            self.norms.append(nn.BatchNorm1d(input_feats))
-            self.norms.append(nn.BatchNorm1d(input_feats))
-        elif normalization == 'layer':
-            self.norms.append(nn.LayerNorm(input_feats))
-            self.norms.append(nn.LayerNorm(input_feats))
-
-    def forward(self, x):
-        temp = x
-        x = self.layers[0](x)
-        x = self.acts[0](x)
-        x = self.norms[0](x)
-        x = self.dropout(x)
-
-        x = self.layers[1](x) + temp
-        x = self.acts[1](x)
-        x = self.norms[1](x)
-        x = self.dropout(x)
-
-        return x
-
-
 class Nonelayer(nn.Module):
     def __init__(self):
         super().__init__()
@@ -489,23 +444,57 @@ class AbsModel(nn.Module):
         return mod
 
 
+###### multi-head attention encoder ######
+class Encoder(nn.Module):
+    def __init__(self, dim_inp, dropout, attention_heads):
+        super().__init__()
+        self.attention = nn.MultiheadAttention(1, num_heads=attention_heads, dropout=dropout)
+        self.fc = nn.Sequential(
+            nn.Linear(dim_inp, dim_inp),
+            nn.Dropout(dropout),
+            nn.GELU(),
+            nn.Linear(dim_inp, dim_inp),
+            nn.Dropout(dropout)
+        )
+        self.norm = nn.LayerNorm(dim_inp)
+
+    def forward(self, x, attention_mask):
+        x_ori = x
+        x = torch.unsqueeze(x, -1)
+        res = torch.squeeze(self.attention(x, x, x, key_padding_mask=attention_mask)[0], -1)
+        res = self.norm(x_ori + res)
+        res = self.norm(res + self.fc(res))
+        return torch.unsqueeze(res, -1)
+
+
+class BERT(nn.Module):
+    def __init__(self, dim_inp, dim_out, num_layer, attention_heads=1, dropout=0.1):
+        super(BERT, self).__init__()
+        self.encoder = nn.ModuleList([
+            Encoder(dim_inp, dropout, attention_heads) for _ in range(num_layer)
+        ])
+        self.fc = nn.Linear(dim_inp, dim_out)
+
+    def forward(self, input_tensor, attention_mask=None):
+        for head in self.encoder:
+            input_tensor = head(input_tensor, attention_mask)
+        input_tensor = self.fc(torch.squeeze(input_tensor, -1))
+        return input_tensor
+
+
 class ContrastiveModel(nn.Module):
     def __init__(self, args):
         super().__init__()
-        self.embed = AbsModel(args.input_feats, args.embed_hid_feats, args.latent_feats, args.num_embed_layer,
-                              args.activation, args.normalization, args.dropout, 'relu')
+        self.embed = BERT(args.input_feats, args.latent_feats, args.num_embed_layer, dropout=args.dropout)
         self.predict = AbsModel(args.latent_feats, args.pred_hid_feats, args.out_feats, args.num_pred_layer,
                                 args.activation, args.normalization, args.dropout, args.act_out)
 
     def forward(self, mod, residual=False, types="embed"):
         if types == 'embed':
             # train contrastive learning
-            mod = self.embed(mod, residual)
+            mod = self.embed(mod)
         elif types == 'predict':
             # train predicting modality
-            mod = self.embed(mod, residual)
+            mod = self.embed(mod)
             mod = self.predict(mod, residual)
         return mod
-
-
-

@@ -12,15 +12,17 @@ from utils import *
 
 device = torch.device("cuda:0")
 
-dataset_path = 'data/paper data/gex2atac/'
-pretrain_path = 'pretrain/paper data/gex2atac/'
+mod1 = 'gex'
+mod2 = 'atac'
+dataset_path = f'data/paper data/{mod1}2{mod2}/'
+pretrain_path = f'pretrain/paper data/{mod1}2{mod2}/'
 
 param = {
     'use_pretrained': True,
     'input_train_mod1': f'{dataset_path}train_mod1.h5ad',
     'input_train_mod2': f'{dataset_path}train_mod2.h5ad',
     'subset_pretrain1': f'{pretrain_path}mod1 reducer.pkl',
-    'subset_pretrain2': f'{pretrain_path}mod2 reducer 32.pkl',
+    'subset_pretrain2': f'{pretrain_path}mod2 reducer.pkl',
     'output_pretrain': 'pretrain/',
     'save_model_path': 'saved_model/',
     'logs_path': 'logs/'
@@ -28,15 +30,14 @@ param = {
 
 args1 = Namespace(
     num_class=22,
-    embed_hid_feats=512,
-    latent_feats=64,
-    pred_hid_feats=512,
+    latent_feats=256,
+    pred_hid_feats=256,
     random_seed=17,
     activation='relu',
-    act_out='sigmoid',
-    num_embed_layer=8,  # if using residual, this number must divisible by 2
-    num_pred_layer=8,  # if using residual, this number must divisible by 2
-    dropout=0.2,
+    act_out='none',
+    num_embed_layer=1,
+    num_pred_layer=2,  # if using residual, this number must divisible by 2
+    dropout=0.1,
     epochs=1000,
     lr_embed=1e-4,
     lr_predict=1e-4,
@@ -46,15 +47,14 @@ args1 = Namespace(
 
 args2 = Namespace(
     num_class=22,
-    embed_hid_feats=512,
-    latent_feats=64,
-    pred_hid_feats=512,
+    latent_feats=256,
+    pred_hid_feats=256,
     random_seed=17,
     activation='relu',
-    act_out='relu',
-    num_embed_layer=8,  # if using residual, this number must divisible by 2
-    num_pred_layer=8,  # if using residual, this number must divisible by 2
-    dropout=0.2,
+    act_out='none',
+    num_embed_layer=1,
+    num_pred_layer=2,  # if using residual, this number must divisible by 2
+    dropout=0.1,
     epochs=1000,
     lr_embed=1e-4,
     lr_predict=1e-4,
@@ -65,8 +65,6 @@ args2 = Namespace(
 # get feature type
 train_mod1 = sc.read_h5ad(param['input_train_mod1'])
 train_mod2 = sc.read_h5ad(param['input_train_mod2'])
-mod1 = 'gex'
-mod2 = 'atac'
 
 now = datetime.now()
 time_train = now.strftime("%d_%m_%Y %H_%M_%S") + f' {mod1} to {mod2}'
@@ -78,16 +76,16 @@ mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
 mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
 # net1 input and output
-# net1_input = csc_matrix(mod1_reducer.transform(train_mod1.X))
-# net1_output = train_mod2.X
-# net2_input = csc_matrix(mod2_reducer.transform(train_mod2.X))
-# net2_output = train_mod1.X
-
-# # if not using reducer
-net1_input = train_mod1.X
+net1_input = csc_matrix(mod1_reducer.transform(train_mod1.X))
 net1_output = train_mod2.X
-net2_input = train_mod2.X
+net2_input = csc_matrix(mod2_reducer.transform(train_mod2.X))
 net2_output = train_mod1.X
+
+# # # if not using reducer
+# net1_input = train_mod1.X
+# net1_output = train_mod2.X
+# net2_input = train_mod2.X
+# net2_output = train_mod1.X
 
 args1.input_feats = net1_input.shape[1]
 args1.out_feats = net1_output.shape[1]
