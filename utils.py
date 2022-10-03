@@ -478,7 +478,7 @@ class BERT(nn.Module):
     def forward(self, input_tensor, attention_mask=None):
         for head in self.encoder:
             input_tensor = head(input_tensor, attention_mask)
-        input_tensor = self.fc(torch.squeeze(input_tensor, -1))
+        input_tensor = self.fc(input_tensor)
         return input_tensor
 
 
