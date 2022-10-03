@@ -225,8 +225,8 @@ def train_contrastive(train_loader, val_loader, net1, net2, args1, logger):
 
             opt1.zero_grad()
             opt2.zero_grad()
-            out1 = net1(mod1_batch, residual=True, types='embed')
-            out2 = net2(mod2_batch, residual=True, types='embed')
+            out1 = net1(mod1_batch, types='embed')
+            out2 = net2(mod2_batch, types='embed')
 
             # optimize net 1
             out = torch.cat((out1, out2))
@@ -464,7 +464,7 @@ class Encoder(nn.Module):
         res = torch.squeeze(self.attention(x, x, x, key_padding_mask=attention_mask)[0], -1)
         res = self.norm(x_ori + res)
         res = self.norm(res + self.fc(res))
-        return torch.unsqueeze(res, -1)
+        return res
 
 
 class BERT(nn.Module):
