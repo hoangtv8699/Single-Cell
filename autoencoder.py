@@ -30,14 +30,14 @@ param = {
 
 args1 = Namespace(
     num_class=22,
-    latent_feats=16,
-    pred_hid_feats=512,
-    embed_hid_feats=512,
+    latent_feats=64,
+    pred_hid_feats=256,
+    embed_hid_feats=256,
     random_seed=17,
     activation='relu',
     act_out='none',
-    num_embed_layer=2,
-    num_pred_layer=2,  # if using residual, this number must divisible by 2
+    num_embed_layer=4,
+    num_pred_layer=4,  # if using residual, this number must divisible by 2
     dropout=0.2,
     epochs=1000,
     lr_embed=1e-4,
@@ -48,14 +48,14 @@ args1 = Namespace(
 
 args2 = Namespace(
     num_class=22,
-    latent_feats=16,
-    pred_hid_feats=512,
-    embed_hid_feats=512,
+    latent_feats=64,
+    pred_hid_feats=256,
+    embed_hid_feats=256,
     random_seed=17,
     activation='relu',
     act_out='none',
-    num_embed_layer=2,
-    num_pred_layer=2,  # if using residual, this number must divisible by 2
+    num_embed_layer=4,
+    num_pred_layer=4,  # if using residual, this number must divisible by 2
     dropout=0.2,
     epochs=1000,
     lr_embed=1e-4,
@@ -70,18 +70,18 @@ train_mod2 = sc.read_h5ad(param['input_train_mod2'])
 
 now = datetime.now()
 time_train = now.strftime("%d_%m_%Y %H_%M_%S") + f' {mod1} to {mod2}'
-# time_train = '03_10_2022 22_30_28 gex to atac'
+# time_train = '27_09_2022 09_15_57 mod'
 os.mkdir(f'{param["save_model_path"]}{time_train}')
 logger = open(f'{param["logs_path"]}{time_train}.log', 'a')
 
 mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
 mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
-# net1 input and output
+# # net1 input and output
 # net1_input = csc_matrix(mod1_reducer.transform(train_mod1.X))
-# net1_output = csc_matrix(mod2_reducer.transform(train_mod2.X))
+# net1_output = train_mod2.X
 # net2_input = csc_matrix(mod2_reducer.transform(train_mod2.X))
-# net2_output = csc_matrix(mod1_reducer.transform(train_mod1.X))
+# net2_output = train_mod1.X
 
 # # if not using reducer
 net1_input = train_mod1.X
@@ -90,9 +90,9 @@ net2_input = train_mod2.X
 net2_output = train_mod1.X
 
 args1.input_feats = net1_input.shape[1]
-args1.out_feats = net1_output.shape[1]
+args1.out_feats = net1_input.shape[1]
 args2.input_feats = net2_input.shape[1]
-args2.out_feats = net2_output.shape[1]
+args2.out_feats = net2_input.shape[1]
 
 logger.write('args1: ' + str(args1) + '\n')
 logger.write('args2: ' + str(args2) + '\n')
@@ -136,32 +136,11 @@ val_set = ModalityDataset2(net1_input_val, net2_input_val, types='2mod')
 train_loader = DataLoader(training_set, **params)
 val_loader = DataLoader(val_set, **params)
 
-best_state_dict1, best_state_dict2 = train_contrastive(train_loader, val_loader, net1, net2, args1, logger)
+best_state_dict1, best_state_dict2 = train_autoencoder(train_loader, val_loader, net1, net2, args1, logger)
 
 torch.save(best_state_dict1,
            f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl')
 torch.save(best_state_dict2,
            f'{param["save_model_path"]}{time_train}/model {mod2} param contrastive.pkl')
 
-# load pretrained from dir
-net1.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl'))
-net2.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod2} param contrastive.pkl'))
 
-# train model to predict modality
-training_set1 = ModalityDataset2(net1_input_train, net1_output_train, types='2mod')
-training_set2 = ModalityDataset2(net2_input_train, net2_output_train, types='2mod')
-val_set1 = ModalityDataset2(net1_input_val, net1_output_val, types='2mod')
-val_set2 = ModalityDataset2(net2_input_val, net2_output_val, types='2mod')
-
-train_loader1 = DataLoader(training_set1, **params)
-train_loader2 = DataLoader(training_set2, **params)
-val_loader1 = DataLoader(val_set1, **params)
-val_loader2 = DataLoader(val_set2, **params)
-
-best_state_dict1 = train_predict(train_loader1, val_loader1, net1, args1, logger)
-torch.save(best_state_dict1,
-           f'{param["save_model_path"]}{time_train}/model {mod1} param predict.pkl')
-
-best_state_dict2 = train_predict(train_loader2, val_loader2, net2, args2, logger)
-torch.save(best_state_dict2,
-           f'{param["save_model_path"]}{time_train}/model {mod2} param predict.pkl')

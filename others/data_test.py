@@ -37,3 +37,11 @@ def embedding(mod, n_components, random_seed=0):
 #     #     pk.dump(mod1_reducer, open(f'{path_pretrain + folder}mod1 reducer.pkl', "wb"))
 #     #     mod2_train, mod2_reducer = embedding(train_mod2.X, 256, random_seed=17)
 #     #     pk.dump(mod2_reducer, open(f'{path_pretrain + folder}mod2 reducer.pkl', "wb"))
+
+path = '../data/paper data/gex2adt/train_mod1.h5ad'
+train_mod = sc.read_h5ad(path)
+
+print(train_mod.var_names[5])
+
+
+
