@@ -74,5 +74,4 @@ for result in results:
     name, res = result
     gene_dict[name] = res
 
-print(gene_dict)
 pk.dump(gene_dict, open('gene dict.pkl', 'wb'))
