@@ -33,7 +33,7 @@ gene_locus = {}
 del_key = []
 
 for key in gene_dict.keys():
-    if gene_dict[key] == 'no data':
+    if gene_dict[key] == 'no data' or len(gene_dict[key]['position_in_chromosome']) == 0:
         del_key.append(key)
         continue
     start = gene_dict[key]['position_in_chromosome'][0]['chromosome_from']
@@ -46,10 +46,10 @@ for key in gene_dict.keys():
     for locus in locus_arr:
         tmp = locus.split('-')
         # save atac if atac in the locus of gene
-        if int(tmp[1]) > start and int(tmp[2]) < stop:
+        if int(stop) > int(tmp[1]) > int(start) or int(stop) > int(tmp[2]) > int(start):
             gene_locus[key].append(locus)
         # stop search because it passed the locus
-        if int(tmp[1]) > stop:
+        if int(tmp[1]) > int(stop):
             break
 
 for key in del_key:
