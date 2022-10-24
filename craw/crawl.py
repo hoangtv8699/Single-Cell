@@ -1,8 +1,6 @@
 from Bio import Entrez
-from Bio import SeqIO
 import json
 import xmltodict
-import asn1vnparser
 import scanpy as sc
 import pickle as pk
 
@@ -63,7 +61,6 @@ def crawl(name):
 
 ###### crawl
 
-res = crawl('LZIC')
 # path = '../data/paper data/gex2atac/train_mod1.h5ad'
 # train_mod = sc.read_h5ad(path)
 #
@@ -80,35 +77,16 @@ res = crawl('LZIC')
 # pk.dump(gene_dict, open('gene dict.pkl', 'wb'))
 
 
-# ###### crawl unexpected part
-# with open('error.txt', 'rb') as f:
-#     gene_dict = {}
-#     lines = f.readlines()
-#     for line in lines:
-#         line = line.rstrip()
-#         try:
-#             res = crawl(line.decode("utf-8"))
-#             gene_dict[line] = res
-#         except:
-#             gene_dict[line] = 'no data'
-#             print(line.decode("utf-8") + " special")
-#     pk.dump(gene_dict, open('gene dict 2.pkl', 'wb'))
-
 ###### crawl unexpected part
-# with open('error 2.txt', 'rb') as f:
-#     gene_dict = {}
-#     lines = f.readlines()
-#     names = []
-#     for line in lines:
-#         line = line.rstrip().decode("utf-8")
-#         line = line.split(" ")
-#         if line[1] == 'special':
-#             names.append(line[0])
-#
-#     for name in names:
-#         res = crawl(name)
-#         gene_dict[name] = res
-#     pk.dump(gene_dict, open('gene dict 3.pkl', 'wb'))
+gene_dict = pk.load(open('gene dict.pkl', 'rb'))
+for key in gene_dict.keys():
+    if gene_dict[key] == 'no data':
+        try:
+            res = crawl(key)
+            gene_dict[key] = res
+        except:
+            gene_dict[key] = 'no data'
+pk.dump(gene_dict, open('gene dict 2.pkl', 'wb'))
 
 ##### ensemble part
 # gene = pk.load(open('gene dict.pkl', 'rb'))
