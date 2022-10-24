@@ -63,20 +63,21 @@ def crawl(name):
 
 ###### crawl
 
-path = '../data/paper data/gex2atac/train_mod1.h5ad'
-train_mod = sc.read_h5ad(path)
-
-gene_dict = {}
-
-for name in train_mod.var_names:
-    try:
-        res = crawl(name)
-        gene_dict[name] = res
-    except:
-        gene_dict[name] = 'no data'
-        print(name)
-
-pk.dump(gene_dict, open('gene dict.pkl', 'wb'))
+res = crawl('LZIC')
+# path = '../data/paper data/gex2atac/train_mod1.h5ad'
+# train_mod = sc.read_h5ad(path)
+#
+# gene_dict = {}
+#
+# for name in train_mod.var_names:
+#     try:
+#         res = crawl(name)
+#         gene_dict[name] = res
+#     except:
+#         gene_dict[name] = 'no data'
+#         print(name)
+#
+# pk.dump(gene_dict, open('gene dict.pkl', 'wb'))
 
 
 # ###### crawl unexpected part
