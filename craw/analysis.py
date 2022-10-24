@@ -19,16 +19,6 @@ path_gex = '../data/multiome/gex.h5ad'
 adata_atac = sc.read_h5ad(path_atac)
 adata_gex = sc.read_h5ad(path_gex)
 
-# start = 11736136
-# stop = 11750769
-#
-# for var_name in adata.var_names:
-#     # print(var_name)
-#     var_name = var_name.split('-')
-#     if var_name[0] == 'chr1' and int(var_name[1]) > start and int(var_name[2]) < stop:
-#         print(var_name)
-
-
 chr = {}
 for var_name in adata_atac.var_names:
     k = var_name.split('-')[0]
@@ -40,7 +30,12 @@ for var_name in adata_atac.var_names:
 gene_dict = pk.load(open('gene dict 2.pkl', 'rb'))
 gene_locus = {}
 
+del_key = []
+
 for key in gene_dict.keys():
+    if gene_dict[key] == 'no data':
+        del_key.append(key)
+        continue
     start = gene_dict[key]['position_in_chromosome'][0]['chromosome_from']
     stop = gene_dict[key]['position_in_chromosome'][0]['chromosome_to']
     chr_key = 'chr' + gene_dict[key]['position_in_chromosome'][0]['chromosome_number']
@@ -56,6 +51,9 @@ for key in gene_dict.keys():
         # stop search because it passed the locus
         if int(tmp[1]) > stop:
             break
+
+for key in del_key:
+    del gene_dict[key]
 
 pk.dump(gene_locus, open('gene locus.pkl', 'wb'))
 
