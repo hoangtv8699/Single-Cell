@@ -13,7 +13,7 @@ from utils import *
 device = torch.device("cuda:0")
 
 mod1 = 'gex'
-mod2 = 'atac'
+mod2 = 'adt'
 dataset_path = f'data/paper data/{mod1}2{mod2}/'
 pretrain_path = f'pretrain/paper data/{mod1}2{mod2}/'
 
@@ -36,8 +36,8 @@ args1 = Namespace(
     random_seed=17,
     activation='relu',
     act_out='none',
-    num_embed_layer=2,
-    num_pred_layer=2,  # if using residual, this number must divisible by 2
+    num_embed_layer=6,
+    num_pred_layer=6,  # if using residual, this number must divisible by 2
     dropout=0.2,
     epochs=1000,
     lr_embed=1e-4,
@@ -54,8 +54,8 @@ args2 = Namespace(
     random_seed=17,
     activation='relu',
     act_out='none',
-    num_embed_layer=2,
-    num_pred_layer=2,  # if using residual, this number must divisible by 2
+    num_embed_layer=6,
+    num_pred_layer=6,  # if using residual, this number must divisible by 2
     dropout=0.2,
     epochs=1000,
     lr_embed=1e-4,
@@ -78,16 +78,16 @@ mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
 mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
 # net1 input and output
-# net1_input = csc_matrix(mod1_reducer.transform(train_mod1.X))
-# net1_output = csc_matrix(mod2_reducer.transform(train_mod2.X))
-# net2_input = csc_matrix(mod2_reducer.transform(train_mod2.X))
-# net2_output = csc_matrix(mod1_reducer.transform(train_mod1.X))
+net1_input = csc_matrix(mod1_reducer.transform(train_mod1.X))
+net1_output = csc_matrix(mod2_reducer.transform(train_mod2.X))
+net2_input = csc_matrix(mod2_reducer.transform(train_mod2.X))
+net2_output = csc_matrix(mod1_reducer.transform(train_mod1.X))
 
 # # if not using reducer
-net1_input = train_mod1.X
-net1_output = train_mod2.X
-net2_input = train_mod2.X
-net2_output = train_mod1.X
+# net1_input = train_mod1.X
+# net1_output = train_mod2.X
+# net2_input = train_mod2.X
+# net2_output = train_mod1.X
 
 args1.input_feats = net1_input.shape[1]
 args1.out_feats = net1_output.shape[1]

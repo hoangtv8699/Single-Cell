@@ -8,7 +8,7 @@ from utils import *
 # device = torch.device("cuda:0")
 
 mod1 = 'gex'
-mod2 = 'atac'
+mod2 = 'adt'
 
 
 dataset_path = f'data/paper data/{mod1}2{mod2}/'
@@ -25,7 +25,7 @@ param = {
     'logs_path': 'logs/'
 }
 
-time_train = '04_10_2022 10_32_18 gex to atac'
+time_train = '30_10_2022 21_44_08 gex to adt'
 
 # if load args
 args1 = pk.load(open(f'{param["save_model_path"]}{time_train}/args net1.pkl', 'rb'))
