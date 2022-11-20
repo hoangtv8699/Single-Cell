@@ -1,4 +1,4 @@
-from utils import *
+from contrastive.utils import *
 
 path = 'logs/28_09_2022 03_09_48.log'
 

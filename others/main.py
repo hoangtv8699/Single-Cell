@@ -1,18 +1,11 @@
-import time
-import dgl
-import torch
-import pandas as pd
-import scanpy as sc
-import anndata as ad
 import logging
 import pickle as pk
 from sklearn.model_selection import train_test_split
-from sklearn.decomposition import TruncatedSVD
 from argparse import Namespace
 
 from datetime import datetime
 
-from utils import *
+from contrastive.utils import *
 
 dataset_path = '../data/cite_BMMC_processed/'
 pretrain_path = 'pretrain/cite_BMMC_processed/'

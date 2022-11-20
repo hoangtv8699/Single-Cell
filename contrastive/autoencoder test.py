@@ -10,8 +10,8 @@ from utils import *
 mod1 = 'gex'
 mod2 = 'atac'
 
-dataset_path = 'data/paper data/gex2atac/'
-pretrain_path = 'pretrain/paper data/gex2atac/'
+dataset_path = '../data/paper data/gex2atac/'
+pretrain_path = '../pretrain/paper data/gex2atac/'
 
 param = {
     'use_pretrained': True,

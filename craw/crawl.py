@@ -78,15 +78,15 @@ def crawl(name):
 
 
 ###### crawl unexpected part
-gene_dict = pk.load(open('gene dict.pkl', 'rb'))
-for key in gene_dict.keys():
-    if gene_dict[key] == 'no data':
-        try:
-            res = crawl(key)
-            gene_dict[key] = res
-        except:
-            gene_dict[key] = 'no data'
-pk.dump(gene_dict, open('gene dict 2.pkl', 'wb'))
+# gene_dict = pk.load(open('gene dict.pkl', 'rb'))
+# for key in gene_dict.keys():
+#     if gene_dict[key] == 'no data':
+#         try:
+#             res = crawl(key)
+#             gene_dict[key] = res
+#         except:
+#             gene_dict[key] = 'no data'
+# pk.dump(gene_dict, open('gene dict 2.pkl', 'wb'))
 
 ##### ensemble part
 # gene = pk.load(open('gene dict.pkl', 'rb'))
@@ -125,3 +125,40 @@ pk.dump(gene_dict, open('gene dict 2.pkl', 'wb'))
 #
 # for var_name in train_mod2.var_names:
 #     print(var_name)
+
+# import numpy as np
+# from Bio import Entrez
+# import json
+# import xmltodict
+# import h5py
+# import scanpy as sc
+# import pickle as pk
+#
+# atac_path = '../data/multiome/atac CD8+ T.h5ad'
+# gex_path = '../data/multiome/gex CD8+ T.h5ad'
+# locus_path = '../data/multiome/gene locus new.pkl'
+# h5f_path = '../data/multiome/atac CD8+ T.h5'
+#
+# atac_adata = sc.read(atac_path)
+# gex_adata = sc.read(gex_path)
+# gene_locus = pk.load(open(locus_path, 'rb'))
+#
+# i = 0
+# data_all = []
+# for gene in gene_locus.keys():
+#     if len(gene_locus[gene]) > 6:
+#         continue
+#
+#     data = atac_adata[:, gene_locus[gene]].X.toarray()
+#     zeros = np.zeros((data.shape[0], 6))
+#     zeros[:, :data.shape[1]] = data
+#     data_all.append(zeros)
+#     i += 1
+#     print(i)
+#
+# # creating a file
+# with h5py.File(h5f_path, 'w') as f:
+#     dset = f.create_dataset("default", data=data_all)
+
+
+

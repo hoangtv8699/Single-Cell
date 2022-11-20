@@ -1,13 +1,5 @@
-import time
-import dgl
-import torch
-import pandas as pd
-import scanpy as sc
-import anndata as ad
 import logging
-import pickle as pk
-from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.decomposition import TruncatedSVD
+from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 from argparse import Namespace
@@ -15,7 +7,7 @@ from torch.utils.data import DataLoader
 
 from datetime import datetime
 
-from utils import *
+from contrastive.utils import *
 
 device = torch.device("cuda:0")
 
