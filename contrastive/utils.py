@@ -173,6 +173,50 @@ class ModalityDataset2(Dataset):
 
         return X, y
 
+class ModalityDataset3(Dataset):
+    def __init__(self, adata1, adata2, gene_locus):
+        self.adata1 = adata1
+        self.adata2 = adata2
+        self.gene_locus = gene_locus
+        self.obs_names = adata1.obs_names
+
+    def __len__(self):
+        return self.adata1.X.shape[0]
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        adata_tmp = self.adata1[self.obs_names[idx]]
+
+        X = []
+        for k in self.gene_locus.keys():
+            tmp = adata_tmp[:, self.gene_locus[k]].X.toarray()[0]
+            tmp = np.concatenate((tmp, np.zeros(113 - len(tmp))))
+            X.append(tmp)
+
+        X = torch.tensor(X).float()
+        y = torch.tensor(self.adata2.X[idx].toarray()[0]).float()
+
+        return X, y
+
+class ModalityDataset3(Dataset):
+    def __init__(self, input_data, label):
+        self.input = input_data
+        self.label = label
+
+    def __len__(self):
+        return self.input.shape[0]
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        X = torch.tensor(self.input[idx]).float()
+        y = torch.tensor(self.label[idx]).float()
+
+        return X, y
+
 
 # ranking feature
 def analysis_features(adata, method='wilcoxon', top=100):
@@ -283,17 +327,22 @@ def train_contrastive(train_loader, val_loader, net1, net2, args1, logger):
 def train_contrastive2(train_loader, val_loader, net, args, logger):
     print('train contrastive')
     net.cuda()
-    opt_contras = torch.optim.Adam(net.embed.parameters(), args.lr_embed, weight_decay=0.01)
-    opt_pred = torch.optim.Adam(net.parameters(), args.lr_predict, weight_decay=0.01)
+    net_param1 = list(net.input1.parameters()) + list(net.input2.parameters()) + list(net.encoder.parameters())
+    net_param2 = list(net.decoder.parameters()) + list(net.predict1.parameters()) + list(net.predict2.parameters())
+    opt_encoder = torch.optim.Adam(net_param1, args.lr_embed)
+    opt_decoder = torch.optim.Adam(net_param2, args.lr_embed)
 
-    training_loss1 = []
-    training_loss2 = []
-    val_loss1 = []
-    val_loss2 = []
-    criterion_contras = losses.NTXentLoss(temperature=0.10)
-    criterion_pred = nn.MSELoss()
+    training_contras_loss = []
+    training_recon1_loss = []
+    training_recon2_loss = []
+    val_contras_loss = []
+    val_recon1_loss = []
+    val_recon2_loss = []
+    criterion = losses.NTXentLoss(temperature=0.10)
+    mse = nn.MSELoss()
     trigger_times = 0
-    best_loss = 10000
+    best_loss1 = 10000
+    best_loss2 = 10000
     best_state_dict = net.state_dict()
 
     for epoch in range(args.epochs):
@@ -301,76 +350,89 @@ def train_contrastive2(train_loader, val_loader, net, args, logger):
 
         # training
         net.train()
-        running_loss1 = 0
-        running_loss2 = 0
+        running_contras_loss = 0
+        running_recon1_loss = 0
+        running_recon2_loss = 0
         for mod1_batch, mod2_batch in train_loader:
             mod1_batch, mod2_batch = mod1_batch.cuda(), mod2_batch.cuda()
 
-            opt_contras.zero_grad()
-            out1 = net(mod1_batch, residual=True, types='embed')
-            out2 = net(mod2_batch, residual=True, types='embed')
-
-            # optimize embed
-            out_contras = torch.cat((out1, out2))
-            indices = torch.arange(0, out1.size(0), device=out1.device)
+            opt_encoder.zero_grad()
+            # optimize encoder contrastive
+            embed1 = net(mod1_batch, types='embed1')
+            embed2 = net(mod2_batch, types='embed2')
+            embed = torch.cat((embed1, embed2))
+            indices = torch.arange(0, embed1.size(0), device=embed1.device)
             labels = torch.cat((indices, indices))
-
-            loss1 = criterion_contras(out_contras, labels)
-            running_loss1 += loss1.item() * mod1_batch.size(0)
+            loss1 = criterion(embed, labels)
+            running_contras_loss += loss1.item() * mod1_batch.size(0)
             loss1.backward()
-            opt_contras.step()
+            opt_encoder.step()
 
-            # optimize predict
-            opt_pred.zero_grad()
-            out_pred = net(mod1_batch, residual=True, types='predict')
-            loss2 = criterion_pred(out_pred, mod2_batch)
-            running_loss2 += loss2.item() * mod1_batch.size(0)
+            opt_decoder.zero_grad()
+            # optimize encoder contrastive
+            out1 = net(mod1_batch, types='1to1')
+            out2 = net(mod2_batch, types='2to2')
+            loss2 = mse(out1, mod1_batch)
+            loss3 = mse(out2, mod2_batch)
+            running_recon1_loss += loss2.item() * mod1_batch.size(0)
+            running_recon2_loss += loss3.item() * mod2_batch.size(0)
             loss2.backward()
-            opt_pred.step()
+            loss3.backward()
+            opt_decoder.step()
 
-        training_loss1.append(running_loss1 / len(train_loader.dataset))
-        training_loss2.append(running_loss2 / len(train_loader.dataset))
-        logger.write(f'embed loss: {training_loss1[-1]}\n')
-        logger.write(f'predict loss: {training_loss2[-1]}\n')
+        training_contras_loss.append(running_contras_loss / len(train_loader.dataset))
+        training_recon1_loss.append(running_recon1_loss / len(train_loader.dataset))
+        training_recon2_loss.append(running_recon2_loss / len(train_loader.dataset))
+        logger.write(f'training contras loss: {training_contras_loss[-1]}\n')
+        logger.write(f'training recon1 loss: {training_recon1_loss[-1]}\n')
+        logger.write(f'training recon2 loss: {training_recon2_loss[-1]}\n')
         logger.flush()
 
         # validating
         net.eval()
-        running_loss1 = 0
-        running_loss2 = 0
+        running_contras_loss = 0
+        running_recon1_loss = 0
+        running_recon2_loss = 0
         with torch.no_grad():
             for mod1_batch, mod2_batch in val_loader:
                 mod1_batch, mod2_batch = mod1_batch.cuda(), mod2_batch.cuda()
 
-                out1 = net(mod1_batch, residual=True, types='embed')
-                out2 = net(mod2_batch, residual=True, types='embed')
-
-                out = torch.cat((out1, out2))
-                indices = torch.arange(0, out1.size(0), device=out1.device)
+                # optimize encoder contrastive
+                embed1 = net(mod1_batch, types='embed1')
+                embed2 = net(mod2_batch, types='embed2')
+                embed = torch.cat((embed1, embed2))
+                indices = torch.arange(0, embed1.size(0), device=embed1.device)
                 labels = torch.cat((indices, indices))
+                loss1 = criterion(embed, labels)
+                running_contras_loss += loss1.item() * mod1_batch.size(0)
 
-                loss1 = criterion_contras(out, labels)
-                running_loss1 += loss1.item() * mod1_batch.size(0)
+                # optimize encoder contrastive
+                out1 = net(mod1_batch, types='1to1')
+                out2 = net(mod2_batch, types='2to2')
+                loss2 = mse(out1, mod1_batch)
+                loss3 = mse(out2, mod2_batch)
+                running_recon1_loss += loss2.item() * mod1_batch.size(0)
+                running_recon2_loss += loss3.item() * mod2_batch.size(0)
 
-                out_pred = net(mod1_batch, residual=True, types='predict')
-                loss2 = criterion_pred(out_pred, mod2_batch)
-                running_loss2 += loss2.item() * mod1_batch.size(0)
 
-            val_loss1.append(running_loss1 / len(val_loader.dataset))
-            val_loss2.append(running_loss2 / len(val_loader.dataset))
-        logger.write(f'validation embed loss: {val_loss1[-1]}\n')
-        logger.write(f'validation pred loss: {val_loss2[-1]}\n')
-        logger.flush()
+            val_contras_loss.append(running_contras_loss / len(train_loader.dataset))
+            val_recon1_loss.append(running_recon1_loss / len(train_loader.dataset))
+            val_recon2_loss.append(running_recon2_loss / len(train_loader.dataset))
+            logger.write(f'val contras loss: {val_contras_loss[-1]}\n')
+            logger.write(f'val recon1 loss: {val_recon1_loss[-1]}\n')
+            logger.write(f'val recon2 loss: {val_recon2_loss[-1]}\n')
+            logger.flush()
 
         # early stopping
-        if len(val_loss2) > 2 and val_loss2[-1] >= best_loss:
+        if len(val_recon1_loss) > 2 and (val_recon1_loss[-1] >= best_loss1 or val_recon2_loss[-1] >= best_loss2):
             trigger_times += 1
             if trigger_times >= args.patience:
                 logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
                 logger.flush()
                 break
         else:
-            best_loss = val_loss2[-1]
+            best_loss1 = val_recon1_loss[-1]
+            best_loss2 = val_recon2_loss[-1]
             best_state_dict = net.state_dict()
             trigger_times = 0
 
@@ -438,8 +500,71 @@ def train_predict(train_loader, val_loader, net, args, logger):
                 # loss = criterion(out, labels)
 
                 running_loss += loss.item() * val_batch.size(0)
-
             val_loss.append(running_loss / len(val_loader.dataset))
+        logger.write(f'validation loss: {val_loss[-1]}\n')
+        logger.flush()
+
+        # early stopping
+        if len(val_loss) > 2 and val_loss[-1] >= best_loss:
+            trigger_times += 1
+            if trigger_times >= args.patience:
+                logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
+                logger.flush()
+                break
+        else:
+            best_loss = val_loss[-1]
+            best_state_dict = net.state_dict()
+            trigger_times = 0
+
+        print(epoch)
+    return best_state_dict
+
+def train_bert(train_loader, val_loader, net, args, logger):
+    print('train bert')
+    net.cuda()
+    opt = torch.optim.Adam(net.parameters(), args.lr)
+
+    training_loss = []
+    val_loss = []
+    criterion = nn.MSELoss()
+    trigger_times = 0
+    best_loss = 10000
+    best_state_dict = net.state_dict()
+
+    for epoch in range(args.epochs):
+        logger.write(f'epoch:  {epoch}\n')
+
+        # training
+        net.train()
+        running_loss = 0
+        for train_batch, label in train_loader:
+            train_batch, label = train_batch.cuda(), label.cuda()
+
+            opt.zero_grad()
+            out = net(train_batch)
+            loss = criterion(out, label)
+
+            running_loss += loss.item() * train_batch.size(0)
+            loss.backward()
+            opt.step()
+
+        training_loss.append(math.sqrt(running_loss / len(train_loader.dataset)))
+        logger.write(f'training loss:  {training_loss[-1]}\n')
+        logger.flush()
+
+        # validating
+        net.eval()
+        running_loss = 0
+        running_rmse = 0
+        with torch.no_grad():
+            for val_batch, label in val_loader:
+                val_batch, label = val_batch.cuda(), label.cuda()
+
+                out = net(val_batch)
+                loss = criterion(out, label)
+
+                running_loss += loss.item() * val_batch.size(0)
+            val_loss.append(math.sqrt(running_loss / len(val_loader.dataset)))
         logger.write(f'validation loss: {val_loss[-1]}\n')
         logger.flush()
 
@@ -725,6 +850,59 @@ class ContrastiveModel(nn.Module):
             # train predicting modality
             mod = self.embed(mod, residual)
             mod = self.predict(mod, residual)
+        return mod
+
+
+class ContrastiveModel2(nn.Module):
+    def __init__(self, args):
+        super().__init__()
+        # self.embed = BERT(args.input_feats, args.latent_feats, args.num_embed_layer, dropout=args.dropout)
+        self.input1 = AbsModel(args.input_feats1, args.embed_hid_feats, args.embed_hid_feats, args.num_embed_layer,
+                              args.activation, args.normalization, args.dropout, args.act_out)
+        self.input2 = AbsModel(args.input_feats2, args.embed_hid_feats, args.embed_hid_feats, args.num_embed_layer,
+                              args.activation, args.normalization, args.dropout, args.act_out)
+        self.encoder = AbsModel(args.embed_hid_feats, args.embed_hid_feats, args.latent_feats, args.num_embed_layer,
+                              args.activation, args.normalization, args.dropout, args.act_out)
+        self.decoder = AbsModel(args.latent_feats, args.embed_hid_feats, args.embed_hid_feats, args.num_embed_layer,
+                              args.activation, args.normalization, args.dropout, args.act_out)
+        self.predict1 = AbsModel(args.embed_hid_feats, args.pred_hid_feats, args.out_feats1, args.num_pred_layer,
+                                args.activation, args.normalization, args.dropout, args.act_out)
+        self.predict2 = AbsModel(args.embed_hid_feats, args.pred_hid_feats, args.out_feats2, args.num_pred_layer,
+                                args.activation, args.normalization, args.dropout, args.act_out)
+
+    def forward(self, mod, residual=False, types="embed"):
+        if types == 'embed1':
+            mod = self.input1(mod, residual)
+            mod = self.encoder(mod, residual)
+        elif types == 'embed2':
+            mod = self.input2(mod, residual)
+            mod = self.encoder(mod, residual)
+        elif types == 'pred1':
+            mod = self.decoder(mod, residual)
+            mod = self.predict1(mod, residual)
+        elif types == 'pred2':
+            mod = self.decoder(mod, residual)
+            mod = self.predict2(mod, residual)
+        elif types == '1to1':
+            mod = self.input1(mod, residual)
+            mod = self.encoder(mod, residual)
+            mod = self.decoder(mod, residual)
+            mod = self.predict1(mod, residual)
+        elif types == '2to2':
+            mod = self.input2(mod, residual)
+            mod = self.encoder(mod, residual)
+            mod = self.decoder(mod, residual)
+            mod = self.predict2(mod, residual)
+        elif types == '1to2':
+            mod = self.input1(mod, residual)
+            mod = self.encoder(mod, residual)
+            mod = self.decoder(mod, residual)
+            mod = self.predict2(mod, residual)
+        elif types == '2to1':
+            mod = self.input2(mod, residual)
+            mod = self.encoder(mod, residual)
+            mod = self.decoder(mod, residual)
+            mod = self.predict1(mod, residual)
         return mod
 
 

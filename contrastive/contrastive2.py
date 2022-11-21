@@ -12,10 +12,10 @@ from utils import *
 
 device = torch.device("cuda:0")
 
-mod1 = 'gex'
-mod2 = 'atac'
-dataset_path = f'data/paper data/{mod1}2{mod2}/'
-pretrain_path = f'pretrain/paper data/{mod1}2{mod2}/'
+mod1_name = 'atac'
+mod2_name = 'gex'
+dataset_path = f'../data/paper data/{mod1_name}2{mod2_name}/'
+pretrain_path = f'../pretrain/paper data/{mod1_name}2{mod2_name}/'
 
 param = {
     'use_pretrained': True,
@@ -23,23 +23,23 @@ param = {
     'input_train_mod2': f'{dataset_path}train_mod2.h5ad',
     'subset_pretrain1': f'{pretrain_path}mod1 reducer.pkl',
     'subset_pretrain2': f'{pretrain_path}mod2 reducer.pkl',
-    'output_pretrain': 'pretrain/',
-    'save_model_path': 'saved_model/',
-    'logs_path': 'logs/'
+    'output_pretrain': '../pretrain/',
+    'save_model_path': '../saved_model/',
+    'logs_path': '../logs/'
 }
 
 args = Namespace(
     num_class=22,
     latent_feats=16,
-    pred_hid_feats=512,
-    embed_hid_feats=512,
+    pred_hid_feats=256,
+    embed_hid_feats=256,
     random_seed=17,
     activation='relu',
     act_out='none',
-    num_embed_layer=4,
-    num_pred_layer=4,  # if using residual, this number must divisible by 2
+    num_embed_layer=2,
+    num_pred_layer=2,  # if using residual, this number must divisible by 2
     dropout=0.2,
-    epochs=1000,
+    epochs=1,
     lr_embed=1e-3,
     lr_predict=1e-4,
     normalization='batch',
@@ -51,43 +51,42 @@ train_mod1 = sc.read_h5ad(param['input_train_mod1'])
 train_mod2 = sc.read_h5ad(param['input_train_mod2'])
 
 now = datetime.now()
-time_train = now.strftime("%d_%m_%Y %H_%M_%S") + f' {mod1} to {mod2}'
+time_train = now.strftime("%d_%m_%Y %H_%M_%S") + f' {mod1_name} to {mod2_name}'
 # time_train = '03_10_2022 22_30_28 gex to atac'
 os.mkdir(f'{param["save_model_path"]}{time_train}')
 logger = open(f'{param["logs_path"]}{time_train}.log', 'a')
 
-mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
-mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
+# mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
+# mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
-# net1 input and output
-net_input = csc_matrix(mod1_reducer.transform(train_mod1.X))
-net_output = csc_matrix(mod2_reducer.transform(train_mod2.X))
+# # net1 input and output
+# net_input = csc_matrix(mod1_reducer.transform(train_mod1.X))
+# net_output = csc_matrix(mod2_reducer.transform(train_mod2.X))
 
-# # # if not using reducer
-# net1_input = train_mod1.X
-# net1_output = train_mod2.X
+# # if not using reducer
+mod1 = train_mod1.X
+mod2 = train_mod2.X
 
-args.input_feats = net_input.shape[1]
-args.out_feats = net_output.shape[1]
+args.input_feats1 = mod1.shape[1]
+args.input_feats2 = mod2.shape[1]
+args.out_feats1 = mod1.shape[1]
+args.out_feats2 = mod2.shape[1]
 
 logger.write('args1: ' + str(args) + '\n')
 # dump args
-pk.dump(args, open(f'{param["save_model_path"]}{time_train}/args net1.pkl', 'wb'))
+pk.dump(args, open(f'{param["save_model_path"]}{time_train}/args net.pkl', 'wb'))
 
-net1_input_train, net1_input_val, net1_output_train, net1_output_val = train_test_split(net_input,
-                                                                                        net_output,
-                                                                                        test_size=0.1,
-                                                                                        random_state=args.random_seed)
+mod1_train, mod1_val, mod2_train, mod2_val = train_test_split(mod1, mod2, test_size=0.1, random_state=args.random_seed)
 
-net1_input_train = sc.AnnData(net1_input_train, dtype=net1_input_train.dtype)
-net1_input_val = sc.AnnData(net1_input_val, dtype=net1_input_val.dtype)
-net1_output_train = sc.AnnData(net1_output_train, dtype=net1_output_train.dtype)
-net1_output_val = sc.AnnData(net1_output_val, dtype=net1_output_val.dtype)
+mod1_train = sc.AnnData(mod1_train, dtype=mod1_train.dtype)
+mod1_val = sc.AnnData(mod1_val, dtype=mod1_val.dtype)
+mod2_train = sc.AnnData(mod2_train, dtype=mod2_train.dtype)
+mod2_val = sc.AnnData(mod2_val, dtype=mod2_val.dtype)
 
 del train_mod1
 del train_mod2
 
-net = ContrastiveModel(args)
+net = ContrastiveModel2(args)
 logger.write('net1: ' + str(net) + '\n')
 
 params = {'batch_size': 256,
@@ -95,14 +94,13 @@ params = {'batch_size': 256,
           'num_workers': 0}
 
 # train model by contrastive
-training_set = ModalityDataset2(net1_input_train, net1_output_train, types='2mod')
-val_set = ModalityDataset2(net1_input_val, net1_output_val, types='2mod')
+training_set = ModalityDataset2(mod1_train, mod2_train, types='2mod')
+val_set = ModalityDataset2(mod1_val, mod2_val, types='2mod')
 
 train_loader = DataLoader(training_set, **params)
 val_loader = DataLoader(val_set, **params)
 
-best_state_dict1 = train_contrastive2(train_loader, val_loader, net, args, logger)
+best_state_dict = train_contrastive2(train_loader, val_loader, net, args, logger)
 
-torch.save(best_state_dict1,
-           f'{param["save_model_path"]}{time_train}/model {mod1} param contrastive.pkl')
-
+torch.save(best_state_dict,
+           f'{param["save_model_path"]}{time_train}/model param contrastive.pkl')
