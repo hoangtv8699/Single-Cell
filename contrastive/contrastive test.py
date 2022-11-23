@@ -7,12 +7,11 @@ from utils import *
 
 # device = torch.device("cuda:0")
 
-mod1 = 'gex'
-mod2 = 'adt'
+mod1_name = 'atac'
+mod2_name = 'gex'
 
-
-dataset_path = f'data/paper data/{mod1}2{mod2}/'
-pretrain_path = f'pretrain/paper data/{mod1}2{mod2}/'
+dataset_path = f'../data/paper data/{mod1_name}2{mod2_name}/'
+pretrain_path = f'../pretrain/paper data/{mod1_name}2{mod2_name}/'
 
 param = {
     'use_pretrained': True,
@@ -20,16 +19,15 @@ param = {
     'input_test_mod2': f'{dataset_path}test_mod2.h5ad',
     'subset_pretrain1': f'{pretrain_path}mod1 reducer.pkl',
     'subset_pretrain2': f'{pretrain_path}mod2 reducer.pkl',
-    'output_pretrain': 'pretrain/',
-    'save_model_path': 'saved_model/',
-    'logs_path': 'logs/'
+    'output_pretrain': '../pretrain/',
+    'save_model_path': '../saved_model/',
+    'logs_path': '../logs/'
 }
 
-time_train = '30_10_2022 21_44_08 gex to adt'
+time_train = '23_11_2022 11_06_19 atac to gex'
 
 # if load args
-args1 = pk.load(open(f'{param["save_model_path"]}{time_train}/args net1.pkl', 'rb'))
-args2 = pk.load(open(f'{param["save_model_path"]}{time_train}/args net2.pkl', 'rb'))
+args = pk.load(open(f'{param["save_model_path"]}{time_train}/args net.pkl', 'rb'))
 
 # get feature type
 test_mod1 = sc.read_h5ad(param['input_test_mod1'])
@@ -39,33 +37,47 @@ test_mod2 = sc.read_h5ad(param['input_test_mod2'])
 mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
 mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
-params = {'batch_size': 2000,
+params = {'batch_size': 256,
           'shuffle': False,
           'num_workers': 0}
 
 # test model mod 1
-input = csc_matrix(mod1_reducer.transform(test_mod1.X))
-# labels = csc_matrix(mod1_reducer.transform(test_mod2.X))
+# mod1 = csc_matrix(mod1_reducer.transform(test_mod1.X))
+# mod2  = test_mod2.X
+mod1 = test_mod1.X
+mod2 = csc_matrix(mod2_reducer.transform(test_mod2.X))
 
-# input = test_mod1.X
-labels = test_mod2.X
+# mod1 = test_mod1.X.toarray()
+# mod2 = test_mod2.X.toarray()
+# input = csc_matrix(mod1_reducer.transform(test_mod1.X))
 
-val_set = ModalityDataset(input, labels, types='2mod')
+mod1 = sc.AnnData(mod1, dtype=mod1.dtype)
+mod2 = sc.AnnData(mod2, dtype=mod2.dtype)
+
+val_set = ModalityDataset2(mod1, mod2)
 val_loader = DataLoader(val_set, **params)
 
-net = ContrastiveModel(args1)
-net.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model {mod1} param predict.pkl'))
+net = ContrastiveModel2(args)
+net.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model param predict.pkl'))
 net.cuda()
 net.eval()
 
-rmse = 0
+rmse1 = 0
+rmse2 = 0
 pear = 0
 with torch.no_grad():
-    for val_batch, label in val_loader:
-        val_batch, label = val_batch.cuda(), label.cuda()
-        out = net(val_batch, residual=True, types='predict')
-        out = mod2_reducer.inverse_transform(out.detach().cpu().numpy())
-        rmse += mean_squared_error(label.detach().cpu().numpy(), out) * val_batch.size(0)
+    for mod1, mod2 in val_loader:
+        mod1, mod2 = mod1.cuda(), mod2.cuda()
+        # out1 = net(mod1, types='1to2')
+        # out2 = net(mod2, types='2to1')
+        # rmse1 += (mean_squared_error(mod2.detach().cpu().numpy(), out1.detach().cpu().numpy()) * mod1.size(0))
+        # rmse2 += (mean_squared_error(mod1.detach().cpu().numpy(), out2.detach().cpu().numpy()) * mod1.size(0))
 
-rmse = math.sqrt(rmse / len(val_loader.dataset))
-print(rmse)
+        # out1 = net(mod2, types='2to1')
+        # out1 = mod1_reducer.inverse_transform(out1.detach().cpu().numpy())
+        # rmse1 += (mean_squared_error(mod1.detach().cpu().numpy(), out1) * mod1.size(0))
+
+rmse1 = math.sqrt(rmse1 / len(val_loader.dataset))
+rmse2 = math.sqrt(rmse2 / len(val_loader.dataset))
+print(rmse1)
+print(rmse2)

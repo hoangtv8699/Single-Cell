@@ -5,4 +5,6 @@
 /test
 /pretrain
 /logs
-/2022/open-problems-multimodal/
+/contrastive/__pycache__
+/craw/__pycache__
+/graph/__pycache__
