@@ -4,6 +4,7 @@ import pickle as pk
 from argparse import Namespace
 from datetime import datetime
 
+import torch
 from scipy.sparse import csc_matrix
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
@@ -57,8 +58,8 @@ time_train = now.strftime("%d_%m_%Y %H_%M_%S") + f' {mod1_name} to {mod2_name}'
 os.mkdir(f'{param["save_model_path"]}{time_train}')
 logger = open(f'{param["logs_path"]}{time_train}.log', 'a')
 
-mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
-mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
+# mod1_reducer = pk.load(open(param['subset_pretrain1'], 'rb'))
+# mod2_reducer = pk.load(open(param['subset_pretrain2'], 'rb'))
 
 # # net1 input and output
 # mod1 = csc_matrix(mod1_reducer.transform(train_mod1.X))
@@ -108,13 +109,16 @@ best_state_dict = train_contrastive(train_loader, val_loader, net, args, logger)
 
 torch.save(best_state_dict,
            f'{param["save_model_path"]}{time_train}/model param contrastive.pkl')
+net.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model param contrastive.pkl'))
 
 best_state_dict = train_autoencoder(train_loader, val_loader, net, args, logger)
 
 torch.save(best_state_dict,
            f'{param["save_model_path"]}{time_train}/model param autoencoder.pkl')
+net.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model param autoencoder.pkl'))
 
 best_state_dict = train_predict(train_loader, val_loader, net, args, logger)
 
 torch.save(best_state_dict,
            f'{param["save_model_path"]}{time_train}/model param predict.pkl')
+net.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/model param predict.pkl'))

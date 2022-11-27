@@ -1,5 +1,8 @@
-import math
+import os
+import pickle as pk
+import threading
 
+import math
 import numpy as np
 import pandas as pd
 import scanpy as sc
@@ -7,10 +10,10 @@ import torch
 import torch.nn.functional as f
 from matplotlib import pyplot as plt
 from pytorch_metric_learning import losses
-from scipy.stats import pearsonr
 from sklearn.decomposition import TruncatedSVD
-from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
 from torch import nn
+from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 
 
@@ -238,7 +241,7 @@ def train_contrastive(train_loader, val_loader, net, args, logger):
             logger.flush()
 
         # early stopping
-        if len(val_contras_loss) > 2 and val_contras_loss[-1] >= best_contras:
+        if len(val_contras_loss) > 2 and round(val_contras_loss[-1], 5) >= round(best_contras, 5):
             trigger_times += 1
             if trigger_times >= args.patience:
                 logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
@@ -320,7 +323,7 @@ def train_autoencoder(train_loader, val_loader, net, args, logger):
 
         # early stopping
         # if len(val_recon1_loss) > 2 and (val_recon1_loss[-1] >= best_loss1 and val_recon2_loss[-1] >= best_loss2):
-        if len(val_recon1_loss) > 2 and val_recon1_loss[-1] >= best_loss1:
+        if len(val_recon1_loss) > 2 and round(val_recon1_loss[-1], 5) >= round(best_loss1, 5):
             trigger_times += 1
             if trigger_times >= args.patience:
                 logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
@@ -403,7 +406,7 @@ def train_predict(train_loader, val_loader, net, args, logger):
 
         # early stopping
         # if len(val_recon1_loss) > 2 and (val_recon1_loss[-1] >= best_loss1 and val_recon2_loss[-1] >= best_loss2):
-        if len(val_recon1_loss) > 2 and val_recon1_loss[-1] >= best_loss1:
+        if len(val_recon1_loss) > 2 and round(val_recon1_loss[-1], 5) >= round(best_loss1, 5):
             trigger_times += 1
             if trigger_times >= args.patience:
                 logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
@@ -420,7 +423,7 @@ def train_predict(train_loader, val_loader, net, args, logger):
 
 
 def train_linear(train_loader, val_loader, net, args, logger):
-    print('train linear')
+    # print('train linear')
     net.cuda()
     opt = torch.optim.Adam(net.parameters(), args.lr)
 
@@ -468,7 +471,7 @@ def train_linear(train_loader, val_loader, net, args, logger):
             logger.flush()
 
         # early stopping
-        if len(val_loss) > 2 and val_loss[-1] >= best_loss:
+        if len(val_loss) > 2 and round(val_loss[-1], 5) >= round(best_loss, 5):
             trigger_times += 1
             if trigger_times >= args.patience:
                 logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
@@ -479,8 +482,60 @@ def train_linear(train_loader, val_loader, net, args, logger):
             best_state_dict = net.state_dict()
             trigger_times = 0
 
-        print(epoch)
+        # print(epoch)
     return best_state_dict
+
+
+def train(time_train, param, args, gene_list, gene_locus, train_mod1_ori, train_mod2_ori):
+    print(threading.currentThread().getName(), 'Starting')
+    for gene_name in gene_list:
+
+        # check if model is trained
+        if os.path.exists(f'{param["save_model_path"]}{time_train}/{gene_name}.pkl'):
+            continue
+
+        train_mod1 = train_mod1_ori[:, gene_locus[gene_name]]
+        train_mod2 = train_mod2_ori[:, gene_name]
+        logger = open(f'{param["logs_path"]}{time_train}/{gene_name}.log', 'a')
+
+        mod1 = train_mod1.X
+        mod2 = train_mod2.X
+
+        # mod1 = train_mod1.layers['counts']
+        # mod2 = train_mod2.X
+
+        logger.write('args: ' + str(args) + '\n')
+        pk.dump(args, open(f'{param["save_model_path"]}{time_train}/args net.pkl', 'wb'))
+
+        mod1_train, mod1_val, mod2_train, mod2_val = train_test_split(mod1, mod2, test_size=0.1,
+                                                                      random_state=args.random_seed)
+
+        mod1_train = sc.AnnData(mod1_train, dtype=mod1_train.dtype)
+        mod1_val = sc.AnnData(mod1_val, dtype=mod1_val.dtype)
+        mod2_train = sc.AnnData(mod2_train, dtype=mod2_train.dtype)
+        mod2_val = sc.AnnData(mod2_val, dtype=mod2_val.dtype)
+
+        del train_mod1
+        del train_mod2
+
+        net = LinearRegressionModel(mod1.shape[1], mod2.shape[1])
+        logger.write('net1: ' + str(net) + '\n')
+        params = {'batch_size': 256,
+                  'shuffle': True,
+                  'num_workers': 0}
+
+        # train model by contrastive
+        training_set = ModalityDataset2(mod1_train, mod2_train)
+        val_set = ModalityDataset2(mod1_val, mod2_val)
+        train_loader = DataLoader(training_set, **params)
+        val_loader = DataLoader(val_set, **params)
+
+        best_state_dict = train_linear(train_loader, val_loader, net, args, logger)
+
+        torch.save(best_state_dict,
+                   f'{param["save_model_path"]}{time_train}/{gene_name}.pkl')
+        print(gene_name)
+    print(threading.currentThread().getName(), 'Exiting')
 
 
 class AbsModel(nn.Module):
@@ -678,3 +733,8 @@ class LinearRegressionModel(torch.nn.Module):
     def forward(self, x):
         y_pred = self.linear(x)
         return y_pred
+
+def cal_rmse(ad_pred, ad_sol):
+    tmp = ad_sol - ad_pred
+    rmse = np.sqrt(tmp.power(2).mean())
+    return rmse
