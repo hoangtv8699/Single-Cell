@@ -6,6 +6,7 @@ from datetime import datetime
 
 from scipy.sparse import csc_matrix
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 from torch.utils.data import DataLoader
 
 from utils import *
@@ -42,8 +43,18 @@ os.mkdir(f'{param["logs_path"]}{time_train}')
 train_mod1_ori = sc.read_h5ad(param['input_train_mod1'])
 train_mod2_ori = sc.read_h5ad(param['input_train_mod2'])
 
-gene_locus = pk.load(open('../data/gene locus new.pkl', 'rb'))
-gene_list = list(gene_locus.keys())
+# if using raw data
+train_mod1_ori.X = train_mod1_ori.layers['counts']
+
+# cell_type = 'CD4+ T activated'
+# train_mod1_ori = train_mod1_ori[train_mod1_ori.obs['cell_type'] == cell_type, :]
+# train_mod2_ori = train_mod2_ori[train_mod2_ori.obs['cell_type'] == cell_type, :]
+
+gene_locus = pk.load(open('../craw/gene locus 2.pkl', 'rb'))
+gene_list = []
+for gene_name in gene_locus.keys():
+    if len(gene_locus[gene_name]) > 0:
+        gene_list.append(gene_name)
 # gene_name = gene_list[0]
 
 for gene_name in gene_list:
@@ -51,38 +62,50 @@ for gene_name in gene_list:
     train_mod2 = train_mod2_ori[:, gene_name]
     logger = open(f'{param["logs_path"]}{time_train}/{gene_name}.log', 'a')
 
+    # normalize data
+    sc.pp.log1p(train_mod1)
+    sc.pp.scale(train_mod1)
+
     mod1 = train_mod1.X
-    mod2 = train_mod2.X
+    mod2 = train_mod2.X.toarray()
 
-    logger.write('args1: ' + str(args) + '\n')
-    # dump args
-    pk.dump(args, open(f'{param["save_model_path"]}{time_train}/args net.pkl', 'wb'))
+    # train linear regression model
+    logger.write('sklearn linear regression model' + '\n')
+    net = LinearRegression()
+    net.fit(mod1, mod2)
+    pk.dump(net, open(f'{param["save_model_path"]}{time_train}/{gene_name}.pkl', 'wb'))
+    print(gene_name)
 
-    mod1_train, mod1_val, mod2_train, mod2_val = train_test_split(mod1, mod2, test_size=0.1, random_state=args.random_seed)
+    # # train torch model
+    # logger.write('args1: ' + str(args) + '\n')
+    # # dump args
+    # pk.dump(args, open(f'{param["save_model_path"]}{time_train}/args net.pkl', 'wb'))
+    #
+    # mod1_train, mod1_val, mod2_train, mod2_val = train_test_split(mod1, mod2, test_size=0.1, random_state=args.random_seed)
+    #
+    # mod1_train = sc.AnnData(mod1_train, dtype=mod1_train.dtype)
+    # mod1_val = sc.AnnData(mod1_val, dtype=mod1_val.dtype)
+    # mod2_train = sc.AnnData(mod2_train, dtype=mod2_train.dtype)
+    # mod2_val = sc.AnnData(mod2_val, dtype=mod2_val.dtype)
+    #
+    # del train_mod1
+    # del train_mod2
+    #
+    # net = LinearRegressionModel(mod1.shape[1], mod2.shape[1])
+    # logger.write('net1: ' + str(net) + '\n')
+    #
+    # params = {'batch_size': 256,
+    #           'shuffle': True,
+    #           'num_workers': 0}
+    #
+    # training_set = ModalityDataset2(mod1_train, mod2_train)
+    # val_set = ModalityDataset2(mod1_val, mod2_val)
+    #
+    # train_loader = DataLoader(training_set, **params)
+    # val_loader = DataLoader(val_set, **params)
+    #
+    # best_state_dict = train_linear(train_loader, val_loader, net, args, logger)
+    #
+    # torch.save(best_state_dict,
+    #            f'{param["save_model_path"]}{time_train}/{gene_name}.pkl')
 
-    mod1_train = sc.AnnData(mod1_train, dtype=mod1_train.dtype)
-    mod1_val = sc.AnnData(mod1_val, dtype=mod1_val.dtype)
-    mod2_train = sc.AnnData(mod2_train, dtype=mod2_train.dtype)
-    mod2_val = sc.AnnData(mod2_val, dtype=mod2_val.dtype)
-
-    del train_mod1
-    del train_mod2
-
-    net = LinearRegressionModel(mod1.shape[1], mod2.shape[1])
-    logger.write('net1: ' + str(net) + '\n')
-
-    params = {'batch_size': 256,
-              'shuffle': True,
-              'num_workers': 0}
-
-    # train model by contrastive
-    training_set = ModalityDataset2(mod1_train, mod2_train)
-    val_set = ModalityDataset2(mod1_val, mod2_val)
-
-    train_loader = DataLoader(training_set, **params)
-    val_loader = DataLoader(val_set, **params)
-
-    best_state_dict = train_linear(train_loader, val_loader, net, args, logger)
-
-    torch.save(best_state_dict,
-               f'{param["save_model_path"]}{time_train}/{gene_name}.pkl')

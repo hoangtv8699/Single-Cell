@@ -24,19 +24,31 @@ param = {
     'logs_path': '../logs/'
 }
 
-time_train = '23_11_2022 16_19_53 atac to gex'
+time_train = '28_11_2022 16_47_12 atac to gex'
 # time_train = '24_11_2022 13_31_02 atac to gex'
-args = pk.load(open(f'{param["save_model_path"]}{time_train}/args net.pkl', 'rb'))
+# args = pk.load(open(f'{param["save_model_path"]}{time_train}/args net.pkl', 'rb'))
 
 # get feature type
 test_mod1_ori = sc.read_h5ad(param['input_test_mod1'])
 test_mod2_ori = sc.read_h5ad(param['input_test_mod2'])
 
-gene_locus = pk.load(open('../data/gene locus new.pkl', 'rb'))
-gene_list = list(gene_locus.keys())
+# if using raw data
+test_mod1_ori.X = test_mod1_ori.layers['counts']
+
+gene_locus = pk.load(open('../craw/gene locus 2.pkl', 'rb'))
+# gene_list = list(gene_locus.keys())
+gene_list = os.listdir(f'{param["save_model_path"]}{time_train}')
 # gene_name = gene_list[0]
 
+excellent = []
+good = []
+bad = []
+
 for gene_name in gene_list:
+    gene_name = gene_name.split('.')[0]
+    if gene_name == 'args net':
+        continue
+
     test_mod1 = test_mod1_ori[:, gene_locus[gene_name]]
     test_mod2 = test_mod2_ori[:, gene_name]
 
@@ -44,42 +56,48 @@ for gene_name in gene_list:
               'shuffle': False,
               'num_workers': 0}
 
-    mod1 = test_mod1.X.toarray()
+    # normalize data
+    sc.pp.log1p(test_mod1)
+    sc.pp.scale(test_mod1)
+
+    mod1 = test_mod1.X
     mod2 = test_mod2.X.toarray()
 
-    mod1 = torch.tensor(mod1).float().cuda()
-    mod2 = torch.tensor(mod2).float()
+    # test sklearn LR model
+    net = pk.load(open(f'{param["save_model_path"]}{time_train}/{gene_name}.pkl', 'rb'))
+    out = net.predict(mod1)
 
-    net = LinearRegressionModel(mod1.shape[1], mod2.shape[1])
-    net.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/{gene_name}.pkl'))
-    net.cuda()
-    net.eval()
-
-    out = net(mod1)
-    # rmse = mean_squared_error(mod2.numpy(), out.detach().cpu().numpy(), squared=False)
-    rmse = cal_rmse(csc_matrix(mod2.numpy()), csc_matrix(out.detach().cpu().numpy()))
+    # rmse = mean_squared_error(mod2, out, squared=False)
+    rmse = cal_rmse(csc_matrix(mod2), csc_matrix(out))
     print(rmse)
 
-    # mod1 = test_mod1.layers['counts']
-    # mod2 = test_mod2.X
+    if rmse < 0.1:
+        excellent.append(gene_name)
+    elif rmse < 0.2:
+        good.append(gene_name)
+    else:
+        bad.append(gene_name)
+    # break
 
-    # mod1 = sc.AnnData(mod1, dtype=mod1.dtype)
-    # mod2 = sc.AnnData(mod2, dtype=mod2.dtype)
-    #
-    # val_set = ModalityDataset2(mod1, mod2)
-    # val_loader = DataLoader(val_set, **params)
+    # # test torch model
+    # mod1 = torch.tensor(mod1).float().cuda()
+    # mod2 = torch.tensor(mod2).float()
     #
     # net = LinearRegressionModel(mod1.shape[1], mod2.shape[1])
     # net.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/{gene_name}.pkl'))
     # net.cuda()
     # net.eval()
     #
-    # rmse = 0
-    # with torch.no_grad():
-    #     for mod1, mod2 in val_loader:
-    #         mod1, mod2 = mod1.cuda(), mod2.cuda()
-    #         out = net(mod1)
-    #         rmse += (mean_squared_error(mod2.detach().cpu().numpy(), out.detach().cpu().numpy()) * mod1.size(0))
-    #
-    # rmse = math.sqrt(rmse / len(val_loader.dataset))
-    # print(f'{gene_name}: {rmse}')
+    # out = net(mod1)
+    # # rmse = mean_squared_error(mod2.numpy(), out.detach().cpu().numpy(), squared=False)
+    # rmse = cal_rmse(csc_matrix(mod2.numpy()), csc_matrix(out.detach().cpu().numpy()))
+    # print(rmse)
+
+
+print(len(excellent), " < 0.1")
+print(len(good), "0.1 < < 0.2")
+print(len(bad), " > 0.2")
+
+pk.dump(excellent, open('excellent.pkl', 'wb'))
+pk.dump(good, open('good.pkl', 'wb'))
+pk.dump(bad, open('bad.pkl', 'wb'))

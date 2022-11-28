@@ -1,99 +1,104 @@
-# # import pickle as pk
-# # import scanpy as sc
-# #
-# #
-# # # path = '../data/multiome_BMMC_processed.h5ad'
-# # # adata = sc.read_h5ad(path)
-# # #
-# # # print(adata)
-# # #
-# # # adata_gex = adata[:, adata.var['feature_types'] == 'GEX']
-# # # adata_atac = adata[:, adata.var['feature_types'] == 'ATAC']
-# # #
-# # # adata_gex.write('../data/multiome/gex.h5ad')
-# # # adata_atac.write('../data/multiome/atac.h5ad')
-# #
-# #
-# # path_atac = '../data/multiome/atac.h5ad'
-# # path_gex = '../data/multiome/gex.h5ad'
-# # adata_atac = sc.read_h5ad(path_atac)
-# # adata_gex = sc.read_h5ad(path_gex)
-# #
-# # chr = {}
-# # for var_name in adata_atac.var_names:
-# #     k = var_name.split('-')[0]
-# #     if k in chr.keys():
-# #         chr[k].append(var_name)
-# #     else:
-# #         chr[k] = [var_name]
-# #
-# # gene_dict = pk.load(open('gene dict 2.pkl', 'rb'))
-# # gene_locus = {}
-# #
-# # del_key = []
-# #
-# # for key in gene_dict.keys():
-# #     if gene_dict[key] == 'no data' or len(gene_dict[key]['position_in_chromosome']) == 0:
-# #         del_key.append(key)
-# #         continue
-# #     start = gene_dict[key]['position_in_chromosome'][0]['chromosome_from']
-# #     stop = gene_dict[key]['position_in_chromosome'][0]['chromosome_to']
-# #     chr_key = 'chr' + gene_dict[key]['position_in_chromosome'][0]['chromosome_number']
-# #
-# #     gene_locus[key] = []
-# #
-# #     locus_arr = chr[chr_key]
-# #     for locus in locus_arr:
-# #         tmp = locus.split('-')
-# #         # save atac if atac in the locus of gene
-# #         if int(stop) > int(tmp[1]) > int(start) or int(stop) > int(tmp[2]) > int(start):
-# #             gene_locus[key].append(locus)
-# #         # stop search because it passed the locus
-# #         if int(tmp[1]) > int(stop):
-# #             break
-# #
-# # for key in del_key:
-# #     del gene_dict[key]
-# #
-# # pk.dump(gene_locus, open('gene locus.pkl', 'wb'))
-# #
-# # input = []
-# # output = []
-# # output_key = []
-# # for k, v in sorted(gene_dict.items(), key=lambda item: item[1]['position_in_chromosome'][0]['chromosome_number'] * 1e9 + item[1]['position_in_chromosome'][0]['chromosome_from']):
-# #     list_atac = gene_locus[k]
-# #     input_tmp = adata_atac[list_atac]
-# #     input.append(input_tmp.X.toarray())
-# #     output_key.append(k)
-# #
-# # output = adata_gex[output_key].X
-# #
-# #
+import pickle as pk
+import scanpy as sc
+import numpy as np
+import matplotlib.pyplot as plt
+import sys
+from multithread import crawl
+
+np.set_printoptions(threshold=sys.maxsize)
+
+path_atac = '../data/multiome/atac.h5ad'
+adata_atac = sc.read_h5ad(path_atac)
+path_gex = '../data/multiome/gex.h5ad'
+adata_gex = sc.read_h5ad(path_gex)
+
+cell_type = 'CD4+ T activated'
+
+# print(adata_atac.obs.value_counts('cell_type'))
+adata_atac = adata_atac[adata_atac.obs['cell_type'] == cell_type, :]
+adata_gex = adata_gex[adata_gex.obs['cell_type'] == cell_type, :]
+
+for key in adata_atac.obs.keys():
+    if key != 'cell_type':
+        del adata_atac.obs[key]
+        del adata_gex.obs[key]
+
+for key in adata_atac.var.keys():
+    del adata_atac.var[key]
+    del adata_gex.var[key]
+
+
+del adata_atac.uns
+del adata_atac.obsm
+del adata_gex.uns
+del adata_gex.obsm
+
+gene_locus = pk.load(open('gene locus new.pkl', 'rb'))
+gene_dict = pk.load(open('gene dict.pkl', 'rb'))
+
+gene_dict2 = {}
+for key in gene_locus.keys():
+    gene_dict2[key] = gene_dict[key]['position_in_chromosome'][0]
+
+print(adata_atac)
+print(gene_locus)
+
+# check crossing in gene
+for k1, v1 in sorted(gene_dict2.items(), key=lambda item: int(item[1]['chromosome_number']) * 1e9 + int(item[1]['chromosome_from'])):
+    for k2, v2 in sorted(gene_dict2.items(), key=lambda item: int(item[1]['chromosome_number']) * 1e9 + int(item[1]['chromosome_from'])):
+        if v1['chromosome_number'] == v2['chromosome_number']:
+            if int(v1['chromosome_from']) < int(v2['chromosome_from']) < int(v1['chromosome_to']):
+                print(k1, k2)
+                print(v1, v2)
+            elif int(v1['chromosome_from']) > int(v2['chromosome_to']):
+                break
+
+
+list_atac = []
+for k, v in sorted(gene_dict2.items(), key=lambda item: int(item[1]['chromosome_number']) * 1e9 + int(item[1]['chromosome_from'])):
+    list_atac += gene_locus[k]
+
+set_atac = set(list_atac)
+print(len(list_atac))
+print(len(set_atac))
+adata_atac = adata_atac[:, list(set_atac)]
+
+adata_atac.write(f'../data/multiome/atac {cell_type}.h5ad')
+adata_gex.write(f'../data/multiome/gex {cell_type}.h5ad')
+
+
+# # gene_atac = {}
+
+# # for k in gene_locus.keys():
+# #     gene_atac[k] = {}
+# #     adata_tmp = adata_atac[:, gene_locus[k]]
+# #     gene_atac[k]['binary'] = adata_tmp.X
+# #     gene_atac[k]['raw'] = adata_tmp.layers['counts']
+
+# # pk.dump(gene_atac, open('gene atac.pkl', 'wb'))
+
+
+###### recreate train and test data with full metadata
+
+# adata_atac_full = sc.read_h5ad('../data/multiome/atac.h5ad')
+# # adata_gex_full = sc.read_h5ad('../data/multiome/gex.h5ad')
 #
-# # a = [1, 2, 8, 7, 1, 0, 6, 2]
-# a = [1, 3, 3, 7, 4, 7, 8, 2, 3]
+# adata_atac_paper = sc.read_h5ad('../data/paper data/atac2gex/test_mod1.h5ad')
+# # adata_gex_paper = sc.read_h5ad('../data/paper data/atac2gex/test_mod2.h5ad')
 #
-# trace_inc = [1] * len(a)
-# trace_dec = [1] * len(a)
-# max_inc = 1
-# max_inc_pos = 0
-# max_dec = 1
-# max_dec_pos = 0
+# train_cell = adata_atac_full.obs_names[adata_atac_full.obs_names.isin(adata_atac_paper.obs_names)]
+# adata_atac = adata_atac_full[train_cell]
+# adata_atac = adata_atac[:, list(adata_atac_paper.var_names)]
 #
-# for i in range(1, len(a)):
-#     if a[i] >= a[i - 1]:
-#         trace_inc[i] = trace_inc[i - 1] + 1
-#         if trace_inc[i] > max_inc:
-#             max_inc = trace_inc[i]
-#             max_inc_pos = i
+# # train_cell = adata_gex_full.obs_names[adata_gex_full.obs_names.isin(adata_gex_paper.obs_names)]
+# # adata_gex = adata_gex_full[train_cell]
+# # adata_gex = adata_gex[:, list(adata_gex_paper.var_names)]
+# #
+# adata_atac.write('../data/multiome/atac2gex/test_mod1.h5ad')
+# # adata_gex.write('../data/multiome/atac2gex/test_mod2.h5ad')
+
+# adata_atac_paper = sc.read_h5ad('../data/multiome/atac2gex/train_mod1.h5ad')
+# adata_gex_paper = sc.read_h5ad('../data/multiome/atac2gex/train_mod2.h5ad')
 #
-#     if a[i] <= a[i - 1]:
-#         trace_dec[i] = trace_dec[i - 1] + 1
-#         if trace_dec[i] > max_dec:
-#             max_dec = trace_dec[i]
-#             max_dec_pos = i
-#
-# if max_inc > max_dec:
-#     print(a[max_inc_pos - max_inc + 1:max_inc_pos + 1])
-# else:
-#     print(a[max_dec_pos - max_dec + 1:max_dec_pos + 1])
+# print(adata_atac_paper)
+# print(adata_gex_paper)

@@ -1,6 +1,8 @@
 from Bio import Entrez
+from Bio import SeqIO
 import json
 import xmltodict
+# import asn1vnparser
 import scanpy as sc
 import pickle as pk
 
@@ -28,7 +30,7 @@ def crawl(name):
     y = xmltodict.parse(gb)
 
     # get list potision of gene in chromosome
-    chr_in = []
+    chr_in = {}
     chr_list = y['Entrezgene-Set']['Entrezgene']['Entrezgene_locus']['Gene-commentary']
 
     if not isinstance(chr_list, list):
@@ -36,31 +38,37 @@ def crawl(name):
 
     for chro in chr_list:
         try:
+            version = chro['Gene-commentary_heading']
+            if version != 'Reference GRCh38.p14 Primary Assembly':
+                continue
             chr_number = chro['Gene-commentary_type']['#text']
             chr_name = chro['Gene-commentary_accession']
             chr_assem_ver = chro['Gene-commentary_version']
             chr_from = chro['Gene-commentary_seqs']['Seq-loc']['Seq-loc_int']['Seq-interval']['Seq-interval_from']
             chr_to = chro['Gene-commentary_seqs']['Seq-loc']['Seq-loc_int']['Seq-interval']['Seq-interval_to']
+            strand = chro['Gene-commentary_seqs']['Seq-loc']['Seq-loc_int']['Seq-interval']['Seq-interval_strand'][
+                'Na-strand']['@value']
 
-            chr_dict = {
+            chr_in = {
+                'version': version,
+                'strand': strand,
                 'chromosome_number': chr_number,
                 'chromosome_name': chr_name,
                 'chromosome_assembly_version': chr_assem_ver,
                 'chromosome_from': chr_from,
                 'chromosome_to': chr_to
             }
-            chr_in.append(chr_dict)
-        except:
-            print(name + " no data in locus")
+        except Exception as e:
+            continue
 
-    res = {
-        'position_in_chromosome': chr_in,
-    }
-    return res
+    if not chr_in:
+        print(name + " no data in locus")
+        return 'no data'
+
+    return chr_in
 
 
-###### crawl
-
+# ###### crawl
 # path = '../data/paper data/gex2atac/train_mod1.h5ad'
 # train_mod = sc.read_h5ad(path)
 #
@@ -74,91 +82,58 @@ def crawl(name):
 #         gene_dict[name] = 'no data'
 #         print(name)
 #
-# pk.dump(gene_dict, open('gene dict.pkl', 'wb'))
+# pk.dump(gene_dict, open('gene infor.pkl', 'wb'))
+# print(f'total: {len(list(gene_dict.keys()))}')
 
+# analysis
+gene_dict = pk.load(open('gene infor 2.pkl', 'rb'))
 
-###### crawl unexpected part
-# gene_dict = pk.load(open('gene dict.pkl', 'rb'))
-# for key in gene_dict.keys():
-#     if gene_dict[key] == 'no data':
-#         try:
-#             res = crawl(key)
-#             gene_dict[key] = res
-#         except:
-#             gene_dict[key] = 'no data'
-# pk.dump(gene_dict, open('gene dict 2.pkl', 'wb'))
+path1 = '../data/multiome/gex.h5ad'
+path2 = '../data/multiome/atac.h5ad'
+adata_gex = sc.read_h5ad(path1)
+adata_atac = sc.read_h5ad(path2)
 
-##### ensemble part
-# gene = pk.load(open('gene dict.pkl', 'rb'))
-# gene2 = pk.load(open('gene dict 2.pkl', 'rb'))
-# gene3 = pk.load(open('gene dict 3.pkl', 'rb'))
-#
-# for key in gene2.keys():
-#     gene[key] = gene2[key]
-#
-# for key in gene3.keys():
-#     gene[key] = gene3[key]
-#
-# pk.dump(gene, open('gene dict.pkl', 'wb'))
+arr = []
+for key in gene_dict.keys():
+    if gene_dict[key] == 'not found' or gene_dict[key] == 'no data in locus':
+        continue
+    arr.append(gene_dict[key]['chromosome_name'])
 
-# # analysis
-# gene = pk.load(open('gene dict.pkl', 'rb'))
-#
-# path1 = '../data/paper data/gex2atac/train_mod1.h5ad'
-# path2 = '../data/paper data/gex2atac/train_mod2.h5ad'
-# train_mod1 = sc.read_h5ad(path1)
-# train_mod2 = sc.read_h5ad(path2)
-#
-# print(train_mod2.var_names[5])
-# print(gene[train_mod1.var_names[105]])
-# chr_number = 'chr' + gene[train_mod1.var_names[105]]['position_in_chromosome'][0]['chromosome_number']
-# chr_name = gene[train_mod1.var_names[105]]['position_in_chromosome'][0]['chromosome_name']
-# start_in = gene[train_mod1.var_names[105]]['position_in_chromosome'][0]['chromosome_from']
-# stop_in = gene[train_mod1.var_names[105]]['position_in_chromosome'][0]['chromosome_to']
-#
-# # for var_name in train_mod2.var_names:
-# #     var_name = var_name.split('-')
-# #
-# #     if chr_number == var_name[0] or chr_name == var_name[0]:
-# #         if int(var_name[1]) > int(start_in) and int(var_name[2]) < int(stop_in):
-# #             print(var_name)
-#
-# for var_name in train_mod2.var_names:
-#     print(var_name)
+arr = set(arr)
+print(arr)
+locus_arr = adata_atac.var_names
+gene_locus = {}
 
-# import numpy as np
-# from Bio import Entrez
-# import json
-# import xmltodict
-# import h5py
-# import scanpy as sc
-# import pickle as pk
-#
-# atac_path = '../data/multiome/atac CD8+ T.h5ad'
-# gex_path = '../data/multiome/gex CD8+ T.h5ad'
-# locus_path = '../data/multiome/gene locus new.pkl'
-# h5f_path = '../data/multiome/atac CD8+ T.h5'
-#
-# atac_adata = sc.read(atac_path)
-# gex_adata = sc.read(gex_path)
-# gene_locus = pk.load(open(locus_path, 'rb'))
-#
-# i = 0
-# data_all = []
-# for gene in gene_locus.keys():
-#     if len(gene_locus[gene]) > 6:
-#         continue
-#
-#     data = atac_adata[:, gene_locus[gene]].X.toarray()
-#     zeros = np.zeros((data.shape[0], 6))
-#     zeros[:, :data.shape[1]] = data
-#     data_all.append(zeros)
-#     i += 1
-#     print(i)
-#
-# # creating a file
-# with h5py.File(h5f_path, 'w') as f:
-#     dset = f.create_dataset("default", data=data_all)
+count = 0
 
+for key in gene_dict.keys():
+    if gene_dict[key] == 'not found' or gene_dict[key] == 'no data in locus':
+        continue
+    start = int(gene_dict[key]['chromosome_from'])
+    stop = int(gene_dict[key]['chromosome_to'])
+    chr_number = int(gene_dict[key]['chromosome_name'][-6:])
+    strand = gene_dict[key]['strand']
 
+    gene_locus[key] = []
 
+    for locus in locus_arr:
+        tmp = locus.split('-')
+        if tmp[0] == 'chr' + str(chr_number):
+            # save atac if atac in the locus of gene's promoter, only 1500bp from 5'
+            if strand == 'plus':
+                stop = start
+                start = start - 1500
+            else:
+                start = stop
+                stop = stop + 1500
+            # save atac if atac in the locus of gene
+            if (int(tmp[1]) > start and int(tmp[2]) < stop) or (int(tmp[1]) < start < int(tmp[2]) < stop) or (start < int(tmp[1]) < stop < int(tmp[2])):
+                gene_locus[key].append(locus)
+                count += 1
+            # stop search because it passed the locus
+            if int(tmp[1]) > stop:
+                break
+
+print(len(gene_locus.keys()))
+print(count)
+pk.dump(gene_locus, open('gene locus promoter.pkl', 'wb'))
