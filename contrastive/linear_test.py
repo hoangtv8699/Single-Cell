@@ -1,8 +1,10 @@
 import pickle as pk
 
-from scipy.sparse import csc_matrix
+from scipy.sparse import csr_matrix
 from torch.utils.data import DataLoader
 from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import normalize
+
 import math
 
 from utils import *
@@ -17,14 +19,14 @@ pretrain_path = f'../pretrain/paper data/{mod1_name}2{mod2_name}/'
 
 param = {
     'use_pretrained': True,
-    'input_test_mod1': f'{dataset_path}test_mod1.h5ad',
-    'input_test_mod2': f'{dataset_path}test_mod2.h5ad',
+    'input_test_mod1': f'{dataset_path}train_mod1.h5ad',
+    'input_test_mod2': f'{dataset_path}train_mod2.h5ad',
     'output_pretrain': '../pretrain/',
     'save_model_path': '../saved_model/',
     'logs_path': '../logs/'
 }
 
-time_train = '28_11_2022 16_47_12 atac to gex'
+time_train = '28_11_2022 18_43_15 atac to gex'
 # time_train = '24_11_2022 13_31_02 atac to gex'
 # args = pk.load(open(f'{param["save_model_path"]}{time_train}/args net.pkl', 'rb'))
 
@@ -32,8 +34,8 @@ time_train = '28_11_2022 16_47_12 atac to gex'
 test_mod1_ori = sc.read_h5ad(param['input_test_mod1'])
 test_mod2_ori = sc.read_h5ad(param['input_test_mod2'])
 
-# if using raw data
-test_mod1_ori.X = test_mod1_ori.layers['counts']
+# # if using raw data
+# test_mod1_ori.X = normalize(test_mod1_ori.layers['counts'], axis=0)
 
 gene_locus = pk.load(open('../craw/gene locus 2.pkl', 'rb'))
 # gene_list = list(gene_locus.keys())
@@ -44,39 +46,46 @@ excellent = []
 good = []
 bad = []
 
+pred_matrix = []
+gene_names = []
+
+i = 0
 for gene_name in gene_list:
     gene_name = gene_name.split('.')[0]
     if gene_name == 'args net':
         continue
+    gene_names.append(gene_name)
 
     test_mod1 = test_mod1_ori[:, gene_locus[gene_name]]
-    test_mod2 = test_mod2_ori[:, gene_name]
+    # test_mod2 = test_mod2_ori[:, gene_name]
 
     params = {'batch_size': 256,
               'shuffle': False,
               'num_workers': 0}
 
-    # normalize data
-    sc.pp.log1p(test_mod1)
-    sc.pp.scale(test_mod1)
-
-    mod1 = test_mod1.X
-    mod2 = test_mod2.X.toarray()
+    mod1 = test_mod1.X.toarray()
+    # mod2 = test_mod2.X.toarray()
 
     # test sklearn LR model
     net = pk.load(open(f'{param["save_model_path"]}{time_train}/{gene_name}.pkl', 'rb'))
     out = net.predict(mod1)
+    if len(pred_matrix) == 0:
+        pred_matrix = out
+    else:
+        pred_matrix = np.append(pred_matrix, out, axis=1)
+    i += 1
+    print(i)
 
     # rmse = mean_squared_error(mod2, out, squared=False)
-    rmse = cal_rmse(csc_matrix(mod2), csc_matrix(out))
-    print(rmse)
-
-    if rmse < 0.1:
-        excellent.append(gene_name)
-    elif rmse < 0.2:
-        good.append(gene_name)
-    else:
-        bad.append(gene_name)
+    # rmse = cal_rmse(csc_matrix(mod2), csc_matrix(out))
+    # print(rmse)
+    #
+    # if rmse < 0.1:
+    #     excellent.append(gene_name)
+    # elif rmse < 0.2:
+    #     good.append(gene_name)
+    # else:
+    #     bad.append(gene_name)
     # break
 
     # # test torch model
@@ -94,10 +103,22 @@ for gene_name in gene_list:
     # print(rmse)
 
 
-print(len(excellent), " < 0.1")
-print(len(good), "0.1 < < 0.2")
-print(len(bad), " > 0.2")
+# print(len(excellent), " < 0.1")
+# print(len(good), "0.1 < < 0.2")
+# print(len(bad), " > 0.2")
+#
+# pk.dump(excellent, open('excellent.pkl', 'wb'))
+# pk.dump(good, open('good.pkl', 'wb'))
+# pk.dump(bad, open('bad.pkl', 'wb'))
 
-pk.dump(excellent, open('excellent.pkl', 'wb'))
-pk.dump(good, open('good.pkl', 'wb'))
-pk.dump(bad, open('bad.pkl', 'wb'))
+mod2_processed = test_mod2_ori[:, gene_names]
+mod2_processed.write('../data/processed/atac2gex/train_mod2.h5ad')
+
+mod1_processed = sc.AnnData(
+    X=csr_matrix(pred_matrix),
+    obs=mod2_processed.obs,
+    var=mod2_processed.var,
+)
+mod1_processed.write('../data/processed/atac2gex/train_mod1.h5ad')
+
+

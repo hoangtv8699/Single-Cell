@@ -7,64 +7,64 @@ from multithread import crawl
 
 np.set_printoptions(threshold=sys.maxsize)
 
-path_atac = '../data/multiome/atac.h5ad'
-adata_atac = sc.read_h5ad(path_atac)
-path_gex = '../data/multiome/gex.h5ad'
-adata_gex = sc.read_h5ad(path_gex)
-
-cell_type = 'CD4+ T activated'
-
-# print(adata_atac.obs.value_counts('cell_type'))
-adata_atac = adata_atac[adata_atac.obs['cell_type'] == cell_type, :]
-adata_gex = adata_gex[adata_gex.obs['cell_type'] == cell_type, :]
-
-for key in adata_atac.obs.keys():
-    if key != 'cell_type':
-        del adata_atac.obs[key]
-        del adata_gex.obs[key]
-
-for key in adata_atac.var.keys():
-    del adata_atac.var[key]
-    del adata_gex.var[key]
-
-
-del adata_atac.uns
-del adata_atac.obsm
-del adata_gex.uns
-del adata_gex.obsm
-
-gene_locus = pk.load(open('gene locus new.pkl', 'rb'))
-gene_dict = pk.load(open('gene dict.pkl', 'rb'))
-
-gene_dict2 = {}
-for key in gene_locus.keys():
-    gene_dict2[key] = gene_dict[key]['position_in_chromosome'][0]
-
-print(adata_atac)
-print(gene_locus)
-
-# check crossing in gene
-for k1, v1 in sorted(gene_dict2.items(), key=lambda item: int(item[1]['chromosome_number']) * 1e9 + int(item[1]['chromosome_from'])):
-    for k2, v2 in sorted(gene_dict2.items(), key=lambda item: int(item[1]['chromosome_number']) * 1e9 + int(item[1]['chromosome_from'])):
-        if v1['chromosome_number'] == v2['chromosome_number']:
-            if int(v1['chromosome_from']) < int(v2['chromosome_from']) < int(v1['chromosome_to']):
-                print(k1, k2)
-                print(v1, v2)
-            elif int(v1['chromosome_from']) > int(v2['chromosome_to']):
-                break
-
-
-list_atac = []
-for k, v in sorted(gene_dict2.items(), key=lambda item: int(item[1]['chromosome_number']) * 1e9 + int(item[1]['chromosome_from'])):
-    list_atac += gene_locus[k]
-
-set_atac = set(list_atac)
-print(len(list_atac))
-print(len(set_atac))
-adata_atac = adata_atac[:, list(set_atac)]
-
-adata_atac.write(f'../data/multiome/atac {cell_type}.h5ad')
-adata_gex.write(f'../data/multiome/gex {cell_type}.h5ad')
+# path_atac = '../data/multiome/atac.h5ad'
+# adata_atac = sc.read_h5ad(path_atac)
+# path_gex = '../data/multiome/gex.h5ad'
+# adata_gex = sc.read_h5ad(path_gex)
+#
+# cell_type = 'CD4+ T activated'
+#
+# # print(adata_atac.obs.value_counts('cell_type'))
+# adata_atac = adata_atac[adata_atac.obs['cell_type'] == cell_type, :]
+# adata_gex = adata_gex[adata_gex.obs['cell_type'] == cell_type, :]
+#
+# for key in adata_atac.obs.keys():
+#     if key != 'cell_type':
+#         del adata_atac.obs[key]
+#         del adata_gex.obs[key]
+#
+# for key in adata_atac.var.keys():
+#     del adata_atac.var[key]
+#     del adata_gex.var[key]
+#
+#
+# del adata_atac.uns
+# del adata_atac.obsm
+# del adata_gex.uns
+# del adata_gex.obsm
+#
+# gene_locus = pk.load(open('gene locus new.pkl', 'rb'))
+# gene_dict = pk.load(open('gene dict.pkl', 'rb'))
+#
+# gene_dict2 = {}
+# for key in gene_locus.keys():
+#     gene_dict2[key] = gene_dict[key]['position_in_chromosome'][0]
+#
+# print(adata_atac)
+# print(gene_locus)
+#
+# # check crossing in gene
+# for k1, v1 in sorted(gene_dict2.items(), key=lambda item: int(item[1]['chromosome_number']) * 1e9 + int(item[1]['chromosome_from'])):
+#     for k2, v2 in sorted(gene_dict2.items(), key=lambda item: int(item[1]['chromosome_number']) * 1e9 + int(item[1]['chromosome_from'])):
+#         if v1['chromosome_number'] == v2['chromosome_number']:
+#             if int(v1['chromosome_from']) < int(v2['chromosome_from']) < int(v1['chromosome_to']):
+#                 print(k1, k2)
+#                 print(v1, v2)
+#             elif int(v1['chromosome_from']) > int(v2['chromosome_to']):
+#                 break
+#
+#
+# list_atac = []
+# for k, v in sorted(gene_dict2.items(), key=lambda item: int(item[1]['chromosome_number']) * 1e9 + int(item[1]['chromosome_from'])):
+#     list_atac += gene_locus[k]
+#
+# set_atac = set(list_atac)
+# print(len(list_atac))
+# print(len(set_atac))
+# adata_atac = adata_atac[:, list(set_atac)]
+#
+# adata_atac.write(f'../data/multiome/atac {cell_type}.h5ad')
+# adata_gex.write(f'../data/multiome/gex {cell_type}.h5ad')
 
 
 # # gene_atac = {}

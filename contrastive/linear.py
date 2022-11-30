@@ -4,9 +4,10 @@ import pickle as pk
 from argparse import Namespace
 from datetime import datetime
 
-from scipy.sparse import csc_matrix
+from scipy.sparse import csr_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import normalize
 from torch.utils.data import DataLoader
 
 from utils import *
@@ -43,8 +44,8 @@ os.mkdir(f'{param["logs_path"]}{time_train}')
 train_mod1_ori = sc.read_h5ad(param['input_train_mod1'])
 train_mod2_ori = sc.read_h5ad(param['input_train_mod2'])
 
-# if using raw data
-train_mod1_ori.X = train_mod1_ori.layers['counts']
+# # if using raw data
+# train_mod1_ori.X = normalize(train_mod1_ori.layers['counts'], axis=0)
 
 # cell_type = 'CD4+ T activated'
 # train_mod1_ori = train_mod1_ori[train_mod1_ori.obs['cell_type'] == cell_type, :]
@@ -62,11 +63,7 @@ for gene_name in gene_list:
     train_mod2 = train_mod2_ori[:, gene_name]
     logger = open(f'{param["logs_path"]}{time_train}/{gene_name}.log', 'a')
 
-    # normalize data
-    sc.pp.log1p(train_mod1)
-    sc.pp.scale(train_mod1)
-
-    mod1 = train_mod1.X
+    mod1 = train_mod1.X.toarray()
     mod2 = train_mod2.X.toarray()
 
     # train linear regression model
