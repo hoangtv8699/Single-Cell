@@ -120,7 +120,7 @@ def train_contrastive(train_loader, val_loader, net, args, logger):
             logger.flush()
 
         # early stopping
-        if len(val_contras_loss) > 2 and round(val_contras_loss[-1], 5) >= round(best_contras, 5):
+        if len(val_contras_loss) > 2 and round(val_contras_loss[-1], 3) >= round(best_contras, 3):
             trigger_times += 1
             if trigger_times >= args.patience:
                 logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
