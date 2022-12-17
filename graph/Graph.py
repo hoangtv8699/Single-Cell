@@ -33,7 +33,7 @@ param = {
 args = Namespace(
     random_seed=17,
     epochs=1000,
-    lr=1e-4,
+    lr=1e-2,
     patience=10
 )
 
@@ -47,8 +47,10 @@ logger = open(f'{param["logs_path"]}{time_train}/gat.log', 'a')
 # get feature type
 train_mod1_ori = sc.read_h5ad(param['input_train_mod1'])
 train_mod2_ori = sc.read_h5ad(param['input_train_mod2'])
+gene_name = train_mod2_ori.var_names[0]
+
 mod1 = train_mod1_ori.X.toarray()
-mod2 = train_mod2_ori.X.toarray()
+mod2 = train_mod2_ori[:, gene_name].X.toarray()
 src, dst, weights = pk.load(open('../data/graph.pkl', 'rb'))
 edges = [src, dst]
 
@@ -60,15 +62,12 @@ mod1_train, mod1_val, mod2_train, mod2_val = train_test_split(mod1, mod2, test_s
 del train_mod1_ori
 del train_mod2_ori
 
-net = GCN([1, 8, 4, 2], [2, 1])
+net = GCN([1, 8, 2, 1], [mod1_train.shape[1], mod2_train.shape[1]])
 logger.write('net: ' + str(net) + '\n')
-params = {'batch_size': 1,
-          'shuffle': True,
-          'num_workers': 0}
 
 training_set = GraphDataset(mod1_train, mod2_train)
 val_set = GraphDataset(mod1_val, mod2_val)
 
 best_state_dict = train(training_set, val_set, net, args, logger, edges, weights)
 torch.save(best_state_dict,
-           f'{param["save_model_path"]}{time_train}/GAT.pkl')
+           f'{param["save_model_path"]}{time_train}/{gene_name} GAT.pkl')

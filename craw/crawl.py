@@ -88,8 +88,8 @@ def crawl(name):
 # analysis
 gene_dict = pk.load(open('gene infor 2.pkl', 'rb'))
 
-path1 = '../data/multiome/gex.h5ad'
-path2 = '../data/multiome/atac.h5ad'
+path1 = '../data/paper data/atac2gex/train_mod2.h5ad'
+path2 = '../data/paper data/atac2gex/train_mod1.h5ad'
 adata_gex = sc.read_h5ad(path1)
 adata_atac = sc.read_h5ad(path2)
 
@@ -127,7 +127,10 @@ for key in gene_dict.keys():
                 start = stop
                 stop = stop + 1500
             # save atac if atac in the locus of gene
-            if (int(tmp[1]) > start and int(tmp[2]) < stop) or (int(tmp[1]) < start < int(tmp[2]) < stop) or (start < int(tmp[1]) < stop < int(tmp[2])):
+            if (start < int(tmp[1]) and int(tmp[2]) < stop) or \
+                    (int(tmp[1]) < start < int(tmp[2]) < stop) or \
+                    (start < int(tmp[1]) < stop < int(tmp[2])) or \
+                    (start < int(tmp[1]) < int(tmp[2]) < stop):
                 gene_locus[key].append(locus)
                 count += 1
             # stop search because it passed the locus

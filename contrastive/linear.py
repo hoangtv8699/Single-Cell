@@ -51,12 +51,15 @@ train_mod2_ori = sc.read_h5ad(param['input_train_mod2'])
 # train_mod1_ori = train_mod1_ori[train_mod1_ori.obs['cell_type'] == cell_type, :]
 # train_mod2_ori = train_mod2_ori[train_mod2_ori.obs['cell_type'] == cell_type, :]
 
-gene_locus = pk.load(open('../craw/gene locus 2.pkl', 'rb'))
+gene_locus = pk.load(open('../craw/gene locus promoter.pkl', 'rb'))
 gene_list = []
 for gene_name in gene_locus.keys():
     if len(gene_locus[gene_name]) > 0:
         gene_list.append(gene_name)
 # gene_name = gene_list[0]
+
+# gene_list = ['AAK1']
+# gene_locus['AAK1'] = ['chr2-69582036-69582843', 'chr2-69591589-69592502']
 
 for gene_name in gene_list:
     train_mod1 = train_mod1_ori[:, gene_locus[gene_name]]
@@ -72,6 +75,7 @@ for gene_name in gene_list:
     net.fit(mod1, mod2)
     pk.dump(net, open(f'{param["save_model_path"]}{time_train}/{gene_name}.pkl', 'wb'))
     print(gene_name)
+    # break
 
     # # train torch model
     # logger.write('args1: ' + str(args) + '\n')
