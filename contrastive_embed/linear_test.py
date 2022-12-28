@@ -3,6 +3,8 @@ import os
 import pickle as pk
 from argparse import Namespace
 from datetime import datetime
+from scipy.sparse import csr_matrix
+
 
 import numpy as np
 import torch
@@ -31,17 +33,13 @@ args = Namespace(
 
 # get feature type
 atac = sc.read_h5ad(args.train_path)
-atac_paper = sc.read_h5ad('../data/paper data/atac2gex/train_mod1.h5ad')
-# gex_paper = sc.read_h5ad('../data/paper data/atac2gex/train_mod2.h5ad')
-# gex = sc.read_h5ad(args.label_path)
+gex = sc.read_h5ad(args.label_path)
 gene_locus = pk.load(open('../data/multiome/gene locus new.pkl', 'rb'))
 
-gene_list = os.listdir(f'{args.save_path}17_12_2022 17_49_55 atac embed')
-
-now = datetime.now()
-time_train = now.strftime("%d_%m_%Y %H_%M_%S") + f' atac embed'
-os.mkdir(f'{args.save_path}{time_train}')
-os.mkdir(f'{args.logs_path}{time_train}')
+gene_list = []
+for gene_name in gene_locus.keys():
+    if len(gene_locus[gene_name]) > 0:
+        gene_list.append(gene_name)
 
 cell_types_dict = {
     'CD8+ T': 0,
@@ -85,7 +83,7 @@ batch_dict = {
 
 # map cell_type sang number
 atac.obs['cell_type_num'] = atac.obs['cell_type'].map(cell_types_dict)
-atac.obs['batch_num'] = atac.obs['batch'].map(batch_dict)
+# atac.obs['batch_num'] = atac.obs['batch'].map(batch_dict)
 
 # xoa bot thong tin k dung cho do mat thoi gian tach du lieu
 for key in atac.obs_keys():
@@ -98,41 +96,30 @@ for key in atac.var_keys():
 del atac.uns
 del atac.obsm
 
-atac = atac[42492:43492]
-# obs_names = []
-# for name in atac_paper.obs_names:
-#     if name in atac.obs_names:
-#         obs_names.append(atac.obs[name].index)
-#         break
-#
-# print(obs_names)
+atac = atac[41492:42492]
+gex = gex[41492:42492]
+sc.pp.log1p(gex)
 
-out_final = []
+test = atac
+label_test = gex
 
-for gene_name in gene_list:
-    gene_name = gene_name.split('.')[0]
-    if gene_name == 'args net':
-        continue
-    atac_tmp = atac[:, gene_locus[gene_name]]
+gene_name = 'ACAP3'
+test = test[:, gene_locus[gene_name]]
+label_test = label_test[:, gene_name]
 
-    train_gene = torch.tensor(atac_tmp.X.toarray())
-    train_type = torch.tensor(atac_tmp.obs['cell_type_num'])
-    train_gene, train_type = train_gene.cuda(), train_type.cuda()
+test_gene = torch.tensor(test.X.toarray())
+test_type = torch.tensor(test.obs['cell_type_num'])
+train_gene, train_type = test_gene.cuda(), test_type.cuda()
 
-    net = ContrastiveEmbed(train_gene.shape[1])
-    net.load_state_dict(torch.load(f'{args.save_path}17_12_2022 17_49_55 atac embed/{gene_name}.pkl'))
+net = ContrastiveEmbed(train_gene.shape[1])
+net.load_state_dict(torch.load(f'{args.save_path}17_12_2022 17_49_55 atac embed/{gene_name}.pkl'))
+net.cuda()
+out_test = net(train_gene, train_type)
 
-    # train model by contrastive
-    training_set = ModalityDataset(train_gene)
-    net.cuda()
-    out = net(train_gene, train_type)
+net = LinearModel()
+net.load_state_dict(torch.load(f'{args.save_path}21_12_2022 23_47_42 predict/{gene_name}.pkl'))
+net.cuda()
+out_test = net(out_test)
 
-    if len(out_final) == 0:
-        out_final = np.expand_dims(out.detach().cpu().numpy(), axis=1)
-    else:
-        out = np.expand_dims(out.detach().cpu().numpy(), axis=1)
-        out_final = np.concatenate((out_final, out), axis=1)
-    print(gene_name)
-
-pk.dump(out_final, open(f'../data/processed atac test.pkl', 'wb'))
-
+rmse = cal_rmse(label_test.X, csr_matrix(out_test.detach().cpu().numpy()))
+print(rmse)

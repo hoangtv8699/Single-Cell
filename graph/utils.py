@@ -12,7 +12,7 @@ from torch_geometric.nn import SAGEConv
 
 class GraphDataset(Dataset):
     def __init__(self, mod1, mod2):
-        self.mod1 = np.expand_dims(mod1, axis=-1)
+        self.mod1 = mod1
         self.mod2 = mod2
 
     def __len__(self):
