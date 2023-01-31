@@ -12,6 +12,8 @@ adata_atac = sc.read_h5ad(path_atac)
 path_gex = '../data/paper data/atac2gex/train_mod2.h5ad'
 adata_gex = sc.read_h5ad(path_gex)
 
+print(adata_atac)
+
 # cell_type = 'CD8+ T'
 #
 # # print(adata_atac.obs.value_counts('cell_type'))
@@ -38,17 +40,33 @@ gene_dict = pk.load(open('gene infor 2.pkl', 'rb'))
 # print(adata_atac)
 # print(gene_locus)
 
+# list_gex = []
+# list_atac = []
+# for key in gene_locus.keys():
+#     if len(gene_locus[key]) > 0:
+#         # if int(gene_dict[key]['chromosome_name'][-3:]) == 1:
+#         list_gex.append(key)
+#         list_atac += gene_locus[key]
+#
+# atacs = []
+# for atac in adata_atac.var_names:
+#     if atac in list_atac:
+#         atacs.append(atac)
+# gexs = []
+# for gex in adata_gex.var_names:
+#     if gex in list_gex:
+#         gexs.append(gex)
+
 list_gex = []
-list_atac = []
-for key in gene_locus.keys():
-    if len(gene_locus[key]) > 0:
-        # if int(gene_dict[key]['chromosome_name'][-3:]) == 1:
-        list_gex.append(key)
-        list_atac += gene_locus[key]
+for key in gene_dict.keys():
+    if gene_dict[key] not in ['no data in locus', 'not found']:
+        if int(gene_dict[key]['chromosome_name'][-3:]) == 1:
+            list_gex.append(key)
 
 atacs = []
 for atac in adata_atac.var_names:
-    if atac in list_atac:
+    if atac.split('-')[0] == 'chr1':
+        # print(atac)
         atacs.append(atac)
 gexs = []
 for gex in adata_gex.var_names:
@@ -58,8 +76,8 @@ for gex in adata_gex.var_names:
 adata_atac = adata_atac[:, atacs]
 adata_gex = adata_gex[:, gexs]
 
-adata_atac.write(f'../data/paper data/atac2gex/atac_train.h5ad')
-adata_gex.write(f'../data/paper data/atac2gex/gex_train.h5ad')
+adata_atac.write(f'../data/paper data/atac2gex/atac_train_chr1_2.h5ad')
+adata_gex.write(f'../data/paper data/atac2gex/gex_train_chr1_2.h5ad')
 
 
 # # gene_atac = {}
