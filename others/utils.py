@@ -68,7 +68,6 @@ def train_att(train_loader, val_loader, net, args, logger, time_train):
     val_loss = []
     criterion = torch.nn.MSELoss()
     trigger_times = 0
-    trigger_times2 = 0
     best_loss = 10000
     best_state_dict = net.state_dict()
 
@@ -112,7 +111,6 @@ def train_att(train_loader, val_loader, net, args, logger, time_train):
         # early stopping
         if len(val_loss) > 2 and round(val_loss[-1], 5) >= round(best_loss, 5):
             trigger_times += 1
-            trigger_times2 += 1
             if trigger_times >= args.patience:
                 logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
                 logger.flush()
@@ -126,6 +124,7 @@ def train_att(train_loader, val_loader, net, args, logger, time_train):
             #     logger.flush()
 
         else:
+            best_loss = val_loss[-1]
             torch.save(net, f'{args.save_model_path}{time_train}/model.pkl')
             trigger_times = 0
     return best_state_dict

@@ -25,10 +25,7 @@ args = Namespace(
     patience=15,
     train_mod1=f'{dataset_path}atac_train_chr1_2.h5ad',
     train_mod2=f'{dataset_path}gex_train_chr1_2.h5ad',
-    train_mod1_domain=f'{dataset_path}atac_train_chr1.h5ad',
-    test_mod1=f'{dataset_path}atac_test_chr1_2.h5ad',
-    test_mod2=f'{dataset_path}gex_test_chr1_2.h5ad',
-    test_mod1_domain=f'{dataset_path}atac_test_chr1.h5ad',
+    cajal_train_mod2=f'{dataset_path}cajal_train_mod2.h5ad',
     pretrain='../pretrain/',
     save_model_path='../saved_model/',
     logs_path='../logs/',
@@ -44,6 +41,8 @@ logger = open(f'{args.logs_path}{time_train}.log', 'a')
 print('loading data')
 mod1 = sc.read_h5ad(args.train_mod1)
 mod2 = sc.read_h5ad(args.train_mod2)
+cajal_mod2 = sc.read_h5ad(args.cajal_train_mod2)
+cajal_mod2 = cajal_mod2[:, mod2.var_names]
 
 # # normalize per batch
 # train_batches = set(mod1.obs.batch)
@@ -83,12 +82,16 @@ mod1_train = mod1[train_idx]
 mod1_val = mod1[val_idx]
 mod2_train = mod2[train_idx]
 mod2_val = mod2[val_idx]
+cajal_mod2_train = cajal_mod2[train_idx]
+cajal_mod2_val = cajal_mod2[val_idx]
+
+# print(cajal_mod2_train.shape)
 
 net = ModalityNET(mod2_train.shape[1])
 logger.write('net: ' + str(net) + '\n')
 
-training_set = ModalityDataset(mod1_train.X.toarray(), mod2_train.X.toarray(), mod2_train.X.toarray())
-val_set = ModalityDataset(mod1_val.X.toarray(), mod2_val.X.toarray(), mod2_val.X.toarray())
+training_set = ModalityDataset(mod1_train.X.toarray(), cajal_mod2_train.X.toarray(), mod2_train.X.toarray())
+val_set = ModalityDataset(mod1_val.X.toarray(), cajal_mod2_val.X.toarray(), mod2_val.X.toarray())
 
 params = {'batch_size': 16,
           'shuffle': True,

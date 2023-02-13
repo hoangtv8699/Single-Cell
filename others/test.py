@@ -31,33 +31,20 @@ param = {
 # time_train = '10_01_2023-15_30_18-atac2gex'
 # 0.216/0.2152 
 # time_train = '11_01_2023-14_56_52-atac2gex'
-time_train = '31_01_2023-14_20_19-atac2gex'
-
-args = pk.load(open(f'{param["save_model_path"]}{time_train}/args net.pkl', 'rb'))
-
-gene_locus = pk.load(open('../craw/gene locus 2.pkl', 'rb'))
-gene_dict = pk.load(open('../craw/gene infor 2.pkl', 'rb'))
-
-
-i = 0
-list_gene = []
-list_atac = []
-for key in gene_locus.keys():
-    if len(gene_locus[key]) > 30 and int(gene_dict[key]['chromosome_name'][-3:]) == 1:
-        list_gene.append(key)
-        list_atac += gene_locus[key]
-        i += 1
-        if i > 0:
-            break
-
-print(len(list_gene))
-print(len(list_atac))
+time_train = '12_02_2023-22_25_23-atac2gex'
 
 # get feature type
 mod1 = sc.read_h5ad(param['input_test_mod1'])
-# mod1_domain = sc.read_h5ad(param['test_mod1_domain'])
-mod1_domain = mod1_domain = mod1[:, list_atac]
-mod2 = sc.read_h5ad(param['input_test_mod2'])[:,list_gene]
+mod2 = sc.read_h5ad(param['input_test_mod2'])
+
+with open("transformation.pkl", "rb") as f:
+    info = pk.load(f)
+
+X_test = mod1.X.toarray()
+X_test = X_test.T
+X_test = (X_test - info["means"]) / info["sds"]
+X_test = X_test.T
+mod1.X = csr_matrix(X_test)
 
 # svd = pk.load(open(f'{pretrain_path}atac 64.pkl', 'rb'))
 
@@ -85,7 +72,7 @@ cajal_out = cajal[:, mod2.var_names]
 # mod1 = torch.Tensor(mod1.X.toarray()).int()
 # mod1 = mod1.cuda()
 
-test_set = ModalityDataset2(mod1, mod1_domain, mod2)
+test_set = ModalityDataset(mod1.X.toarray(), cajal_out.X.toarray(), mod2.X.toarray())
 
 params = {'batch_size': 16,
           'shuffle': False,
@@ -93,8 +80,7 @@ params = {'batch_size': 16,
 
 test_loader = DataLoader(test_set, **params)
 
-net = AutoEncoder(mod1.shape[1], mod1_domain.shape[1], mod2.shape[1])
-net.load_state_dict(torch.load(f'{param["save_model_path"]}{time_train}/GAT.pkl'))
+net = torch.load(f'{param["save_model_path"]}{time_train}/model.pkl')
 net.cuda()
 net.eval()
 
