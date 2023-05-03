@@ -26,7 +26,7 @@ args = Namespace(
     patience=15,
     test_mod1=f'{dataset_path}test_mod1.h5ad',
     test_mod2=f'{dataset_path}test_mod2.h5ad',
-    test_mod2_cajal=f'{dataset_path}test_mod2_cajal.h5ad',
+    test_mod2_cajal=f'{dataset_path}test_mod2_simple.h5ad',
     pretrain='../pretrain/',
     save_model_path='../saved_model/',
     logs_path='../logs/',
@@ -37,7 +37,7 @@ args = Namespace(
 # time_train = '10_01_2023-15_30_18-atac2gex'
 # 0.216/0.2152
 # time_train = '11_01_2023-14_56_52-atac2gex'
-time_train = '12_02_2023-22_25_23-atac2gex'
+time_train = '22_04_2023-15_40_47-atac2gex-23chr'
 
 gene_locus = pk.load(open('../craw/gene locus 2.pkl', 'rb'))
 gene_dict = pk.load(open('../craw/gene infor 2.pkl', 'rb'))
@@ -46,7 +46,11 @@ gene_dict = pk.load(open('../craw/gene infor 2.pkl', 'rb'))
 mod1_full = sc.read_h5ad(args.test_mod1)
 mod2_full = sc.read_h5ad(args.test_mod2)
 
-for chr in range(1, 24):
+cajal_full = []
+label_full = []
+out_full = []
+
+for chr in range(1, 23):
     model_path = f'{args.save_model_path}{time_train}/chr{str(chr)}/model.pkl'
     tranformation_path = f'{args.save_model_path}{time_train}/chr{str(chr)}/transformation.pkl'
     mod1_path = f'{dataset_path}chr{str(chr)}/atac_test.h5ad'
@@ -88,7 +92,7 @@ for chr in range(1, 24):
     X_test = X_test.T
     mod1.X = csr_matrix(X_test)
 
-    cajal = sc.read_h5ad('../data/paper data/atac2gex/output.h5ad')
+    cajal = sc.read_h5ad('../data/paper data/atac2gex/test_mod2_simple.h5ad')
     cajal_out = cajal[:, mod2.var_names]
 
     params = {'batch_size': 16,
@@ -97,7 +101,7 @@ for chr in range(1, 24):
     test_set = ModalityDataset(mod1.X.toarray(), cajal_out.X.toarray(), mod2.X.toarray())
     test_loader = DataLoader(test_set, **params)
 
-    net = torch.load(f'{args.save_model_path}{time_train}/model.pkl')
+    net = torch.load(model_path)
     net.cuda()
     net.eval()
 
@@ -114,3 +118,17 @@ for chr in range(1, 24):
     rmse = cal_rmse(mod2.X, csr_matrix(outs))
     rmse2 = cal_rmse(mod2.X, cajal_out.X)
     print('result on chr', chr, ': ' ,rmse, rmse2)
+
+    if len(cajal_full) == 0:
+        cajal_full = cajal_out.X.toarray()
+        label_full = mod2.X.toarray()
+        out_full = outs
+    else:
+        cajal_full = np.concatenate((cajal_full, cajal_out.X.toarray()), axis=1)
+        label_full = np.concatenate((label_full, mod2.X.toarray()), axis=1)
+        out_full = np.concatenate((out_full, outs), axis=1)
+
+rmse_full = cal_rmse(csr_matrix(label_full), csr_matrix(out_full))
+rmse2_full = cal_rmse(csr_matrix(label_full), csr_matrix(cajal_full))
+print(label_full.shape)
+print('result on full:' ,rmse_full, rmse2_full)

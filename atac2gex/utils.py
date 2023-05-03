@@ -108,13 +108,13 @@ def train_simple(train_loader, val_loader, net, args, logger, time_train):
                 logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
                 logger.flush()
                 break
-            # if trigger_times2 >= (args.patience / 2):
-            #     trigger_times2 = 0
-            #     args.lr = args.lr * args.weight_decay
-            #     for g in opt.param_groups:
-            #         g['lr'] = args.lr
-            #     logger.write(f'lr reduce to {args.lr} because val loss not decrease for {args.patience / 2} epoch\n')
-            #     logger.flush()
+            if trigger_times2 >= 5:
+                trigger_times2 = 0
+                args.lr = args.lr * args.weight_decay
+                for g in opt.param_groups:
+                    g['lr'] = args.lr
+                logger.write(f'lr reduce to {args.lr} because val loss not decrease for 5 epoch\n')
+                logger.flush()
 
         else:
             best_loss = val_loss[-1]
@@ -151,15 +151,15 @@ class ModalityNET(torch.nn.Module):
         self.drop = nn.Dropout(0.3)
         self.norm = nn.ModuleList()
 
-        self.linear.append(nn.Linear(out_dims, 256))
-        self.linear.append(nn.Linear(256, 256))
-        self.linear.append(nn.Linear(256, out_dims))
+        self.linear.append(nn.Linear(out_dims, 1024))
+        self.linear.append(nn.Linear(1024, 2048))
+        self.linear.append(nn.Linear(2048, out_dims))
 
-        self.norm.append(nn.LayerNorm(256))
-        self.norm.append(nn.LayerNorm(256))
+        self.norm.append(nn.LayerNorm(1024))
+        self.norm.append(nn.LayerNorm(2048))
         self.norm.append(nn.LayerNorm(out_dims))
 
-    def forward(self, x, y_pred):
+    def forward(self, x, y_pred, return_attw=False):
         x = torch.unsqueeze(x, dim=-1)
         y_pred = torch.unsqueeze(y_pred, dim=-1)
         x, att_w = self.atts(y_pred, x, x)
@@ -170,17 +170,22 @@ class ModalityNET(torch.nn.Module):
             x = norm(layer(x))
             x = f.relu(x)
             x = self.drop(x)
+
+        if return_attw:
+            return x, att_w
         return x
 
 
 def train_att(train_loader, val_loader, net, args, logger, time_train, model_path=None):
     net.cuda()
     opt = torch.optim.Adam(net.parameters(), args.lr)
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, mode='min', factor=0.8, patience=5)
 
     training_loss = []
     val_loss = []
     criterion = torch.nn.MSELoss()
     trigger_times = 0
+    trigger_times2 = 0
     best_loss = 10000
     best_state_dict = net.state_dict()
 
@@ -224,25 +229,27 @@ def train_att(train_loader, val_loader, net, args, logger, time_train, model_pat
         # early stopping
         if len(val_loss) > 2 and round(val_loss[-1], 5) >= round(best_loss, 5):
             trigger_times += 1
+            trigger_times2 += 1
             if trigger_times >= args.patience:
                 logger.write(f'early stopping because val loss not decrease for {args.patience} epoch\n')
                 logger.flush()
                 break
-            # if trigger_times2 >= (args.patience / 2):
-            #     trigger_times2 = 0
-            #     args.lr = args.lr * args.weight_decay
-            #     for g in opt.param_groups:
-            #         g['lr'] = args.lr
-            #     logger.write(f'lr reduce to {args.lr} because val loss not decrease for {args.patience / 2} epoch\n')
-            #     logger.flush()
+            if trigger_times2 >= 5:
+                trigger_times2 = 0
+                args.lr = args.lr * args.weight_decay
+                for g in opt.param_groups:
+                    g['lr'] = args.lr
+                logger.write(f'lr reduce to {args.lr} because val loss not decrease for 5 epoch\n')
+                logger.flush()
 
         else:
             best_loss = val_loss[-1]
             if model_path:
-                torch.save(net, f'{args.save_model_path}{time_train}/model.pkl')
+                torch.save(net, model_path)
             else:
                 torch.save(net, f'{args.save_model_path}{time_train}/model.pkl')
             trigger_times = 0
+            trigger_times2 = 0
     return best_state_dict
 
 

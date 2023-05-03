@@ -35,7 +35,12 @@ param = {
 # time_train = '12_02_2023-22_25_23-atac2gex'
 
 # simple path
-time_train = '14_02_2023-00_22_52-atac2gex-simple'
+# time_train = '14_02_2023-00_22_52-atac2gex-simple'
+
+# cajal chr1 path
+# time_train = '14_02_2023-16_32_24-atac2gex-cajal-chr1'
+
+time_train = '14_02_2023-19_12_31-atac2gex-23chr/chr1'
 
 # get feature type
 mod1 = sc.read_h5ad(param['input_test_mod1'])
@@ -50,7 +55,7 @@ X_test = (X_test - info["means"]) / info["sds"]
 X_test = X_test.T
 mod1.X = csr_matrix(X_test)
 
-cajal = sc.read_h5ad('../data/paper data/atac2gex/test_mod2_chr1_cajal.h5ad')
+cajal = sc.read_h5ad('../data/paper data/atac2gex/test_mod2_cajal.h5ad')
 cajal_out = cajal[:, mod2.var_names]
 
 params = {'batch_size': 16,

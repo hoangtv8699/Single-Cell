@@ -34,7 +34,7 @@ args = Namespace(
 )
 
 now = datetime.now()
-time_train = now.strftime("%d_%m_%Y-%H_%M_%S") + f'-{mod1_name}2{mod2_name}-simple'
+time_train = now.strftime("%d_%m_%Y-%H_%M_%S") + f'-{mod1_name}2{mod2_name}-cajal-chr1'
 os.mkdir(f'{args.save_model_path}{time_train}')
 logger = open(f'{args.logs_path}{time_train}.log', 'a')
 

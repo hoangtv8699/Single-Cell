@@ -33,8 +33,11 @@ args = Namespace(
 )
 
 now = datetime.now()
-time_train = now.strftime("%d_%m_%Y-%H_%M_%S") + f'-{mod1_name}2{mod2_name}'
-os.mkdir(f'{args.save_model_path}{time_train}')
+# time_train = now.strftime("%d_%m_%Y-%H_%M_%S") + f'-{mod1_name}2{mod2_name}'
+time_train = '14_02_2023-03_29_31-atac2gex'
+
+if not os.path.exists(f'{args.save_model_path}{time_train}'):
+    os.mkdir(f'{args.save_model_path}{time_train}')
 logger = open(f'{args.logs_path}{time_train}.log', 'a')
 logger.write('args: ' + str(args) + '\n')
 
@@ -69,15 +72,19 @@ info = {"means": mean, "sds": std}
 with open(f'{pretrain_path}transformation.pkl', "wb") as out:
     pk.dump(info, out)
 
-X_train = (X_train - mean) / std
+for i in range(X_train.shape[0]):
+    X_train[i] = (X_train[i] - mean[i]) / std[i]
+
+print(X_train.shape)
+# X_train = (X_train - mean) / std
 X_train = X_train.T
-mod1.X = csr_matrix(X_train)
+# mod1.X = csr_matrix(X_train)
 
 print('reducing data')
 mod1_reducer = TruncatedSVD(n_components=128, random_state=17)
 mod2_reducer = TruncatedSVD(n_components=128, random_state=17)
-X = mod1_reducer.fit_transform(mod1.X)
-y = mod2_reducer.fit_transform(mod2.X)
+X = mod1_reducer.fit_transform(X_train)
+y = mod2_reducer.fit_transform(mod2.X.toarray())
 # save reducer model
 with open(f'{pretrain_path}mod1_reducer.pkl', "wb") as out:
     pk.dump(mod1_reducer, out)
@@ -101,8 +108,8 @@ mod2_val = y[val_idx]
 net = SimpleNET(mod1_train.shape[1], mod2_train.shape[1])
 logger.write('net: ' + str(net) + '\n')
 
-training_set = ModalityDataset2(mod1_train.toarray(), mod2_train.toarray())
-val_set = ModalityDataset2(mod1_val.toarray(), mod2_val.toarray())
+training_set = ModalityDataset2(mod1_train, mod2_train)
+val_set = ModalityDataset2(mod1_val, mod2_val)
 
 params = {'batch_size': 128,
           'shuffle': True,

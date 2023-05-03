@@ -1,6 +1,0 @@
-scanpy
-pandas
-anndata
-scikit-learn
-pytorch-metric-learning
-biopython
