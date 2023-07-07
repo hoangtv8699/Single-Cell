@@ -37,7 +37,7 @@ args = Namespace(
 # time_train = '10_01_2023-15_30_18-atac2gex'
 # 0.216/0.2152
 # time_train = '11_01_2023-14_56_52-atac2gex'
-time_train = '22_04_2023-15_40_47-atac2gex-23chr'
+time_train = '21_04_2023-10_59_37-atac2gex-23chr'
 
 gene_locus = pk.load(open('../craw/gene locus 2.pkl', 'rb'))
 gene_dict = pk.load(open('../craw/gene infor 2.pkl', 'rb'))

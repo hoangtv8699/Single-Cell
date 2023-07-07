@@ -26,7 +26,7 @@ args = Namespace(
     patience=15,
     test_mod1=f'{dataset_path}test_mod1.h5ad',
     test_mod2=f'{dataset_path}test_mod2.h5ad',
-    test_mod2_cajal=f'{dataset_path}test_mod2_simple.h5ad',
+    test_mod2_cajal=f'{dataset_path}test_mod2_cajal.h5ad',
     pretrain='../pretrain/',
     save_model_path='../saved_model/',
     logs_path='../logs/',
@@ -37,7 +37,7 @@ args = Namespace(
 # time_train = '10_01_2023-15_30_18-atac2gex'
 # 0.216/0.2152
 # time_train = '11_01_2023-14_56_52-atac2gex'
-time_train = '22_04_2023-15_40_47-atac2gex-23chr'
+time_train = '21_04_2023-10_59_37-atac2gex-23chr'
 
 gene_locus = pk.load(open('../craw/gene locus 2.pkl', 'rb'))
 gene_dict = pk.load(open('../craw/gene infor 2.pkl', 'rb'))
@@ -45,6 +45,10 @@ gene_dict = pk.load(open('../craw/gene infor 2.pkl', 'rb'))
 # get feature type
 mod1_full = sc.read_h5ad(args.test_mod1)
 mod2_full = sc.read_h5ad(args.test_mod2)
+
+# add cell type attribute
+path_data_ori = '../data/paper data/atac2gex/test_data.h5ad'
+adata_ori = sc.read_h5ad(path_data_ori)
 
 cajal_full = []
 label_full = []
@@ -62,26 +66,27 @@ for chr in range(1, 23):
     if os.path.exists(mod1_path) and os.path.exists(mod2_path):
         mod1 = sc.read_h5ad(mod1_path)
         mod2 = sc.read_h5ad(mod2_path)
-    else:
-        genes = []
-        for key in gene_locus.keys():
-            if int(gene_dict[key]['chromosome_name'][-3:]) == chr:
-                genes.append(key)
-
-        list_atac = []
-        list_gene = []
-        for atac in mod1_full.var_names:
-            if atac.split('-')[0] == ('chr' + str(chr)):
-                list_atac.append(atac)
-        for gex in mod2_full.var_names:
-            if gex in genes:
-                list_gene.append(gex)
-
-        mod1 = mod1_full[:, list_atac]
-        mod2 = mod2_full[:, list_gene]
-
-        mod1.write_h5ad(mod1_path)
-        mod2.write_h5ad(mod2_path)
+        mod2.obs["cell_type"] = adata_ori.obs["cell_group"].tolist()
+    # else:
+    #     genes = []
+    #     for key in gene_locus.keys():
+    #         if int(gene_dict[key]['chromosome_name'][-3:]) == chr:
+    #             genes.append(key)
+    #
+    #     list_atac = []
+    #     list_gene = []
+    #     for atac in mod1_full.var_names:
+    #         if atac.split('-')[0] == ('chr' + str(chr)):
+    #             list_atac.append(atac)
+    #     for gex in mod2_full.var_names:
+    #         if gex in genes:
+    #             list_gene.append(gex)
+    #
+    #     mod1 = mod1_full[:, list_atac]
+    #     mod2 = mod2_full[:, list_gene]
+    #
+    #     mod1.write_h5ad(mod1_path)
+    #     mod2.write_h5ad(mod2_path)
 
     with open(tranformation_path, "rb") as f:
         info = pk.load(f)
@@ -92,13 +97,13 @@ for chr in range(1, 23):
     X_test = X_test.T
     mod1.X = csr_matrix(X_test)
 
-    cajal = sc.read_h5ad('../data/paper data/atac2gex/test_mod2_simple.h5ad')
+    cajal = sc.read_h5ad('../data/paper data/atac2gex/test_mod2_cajal.h5ad')
     cajal_out = cajal[:, mod2.var_names]
 
     params = {'batch_size': 16,
               'shuffle': False,
               'num_workers': 0}
-    test_set = ModalityDataset(mod1.X.toarray(), cajal_out.X.toarray(), mod2.X.toarray())
+    test_set = ModalityDataset3(mod1.X.toarray(), cajal_out.X.toarray(), mod2.X.toarray(), mod2.obs['cell_type'].tolist())
     test_loader = DataLoader(test_set, **params)
 
     net = ModalityNET(mod2.X.shape[1])
@@ -107,14 +112,35 @@ for chr in range(1, 23):
     net.eval()
 
     outs = []
-    for mod1_batch, mod1_domain_batch, mod2_batch in test_loader:
-        mod1_batch, mod1_domain_batch, mod2_batch = mod1_batch.cuda(), mod1_domain_batch.cuda(), mod2_batch.cuda()
-        out = net(mod1_batch, mod1_domain_batch)
-        if len(outs) == 0:
-            outs = out.detach().cpu().numpy()
-        else:
-            outs = np.concatenate((outs, out.detach().cpu().numpy()), axis=0)
+    att_w_dict = {}
+    att_w_count = {}
 
+    list_key = set(mod2.obs['cell_type'].tolist())
+    for key in list_key:
+        att_w_dict[key] = []
+        att_w_count[key] = 0
+
+    for mod1_batch, mod1_domain_batch, mod2_batch, cell_type_batch in test_loader:
+        mod1_batch, mod1_domain_batch, mod2_batch = mod1_batch.cuda(), mod1_domain_batch.cuda(), mod2_batch.cuda()
+        out, att_w = net(mod1_batch, mod1_domain_batch, return_attw=True)
+        out_cpu = out.detach().cpu().numpy()
+        att_w_cpu = att_w.detach().cpu().numpy()
+        if len(outs) == 0:
+            outs = out_cpu
+        else:
+            outs = np.concatenate((outs, out_cpu), axis=0)
+
+        for i in range(len(cell_type_batch)):
+            if len(att_w_dict[cell_type_batch[i]]) == 0:
+                att_w_dict[cell_type_batch[i]] = att_w_cpu[i]
+            else:
+                att_w_dict[cell_type_batch[i]] += att_w_cpu[i]
+            att_w_count[cell_type_batch[i]] += 1
+
+    for key in att_w_dict.keys():
+        att_w_dict[key] /= att_w_count[key]
+
+    pk.dump(att_w_dict, open(f'../data/att w/chr{chr}_mean_att_w_per_cell_group.pkl', 'wb'))
 
     rmse = cal_rmse(mod2.X, csr_matrix(outs))
     rmse2 = cal_rmse(mod2.X, cajal_out.X)
@@ -129,7 +155,9 @@ for chr in range(1, 23):
         label_full = np.concatenate((label_full, mod2.X.toarray()), axis=1)
         out_full = np.concatenate((out_full, outs), axis=1)
 
+
+
 rmse_full = cal_rmse(csr_matrix(label_full), csr_matrix(out_full))
 rmse2_full = cal_rmse(csr_matrix(label_full), csr_matrix(cajal_full))
 print(label_full.shape)
-print('result on full:' ,rmse_full, rmse2_full)
+print('result on full:', rmse_full, rmse2_full)

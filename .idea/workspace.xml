@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="40f557ff-e0a7-426c-b010-d5713a926c59" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/atac2gex/test_23chr_attw.py" afterDir="false" />
+    <list default="true" id="7924fa5e-46c7-42ed-86cb-454985fb8b81" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/Single-Cell.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Single-Cell.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/atac2gex/test_23chr.py" beforeDir="false" afterPath="$PROJECT_DIR$/atac2gex/test_23chr.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/atac2gex/test_23chr_attw.py" beforeDir="false" afterPath="$PROJECT_DIR$/atac2gex/test_23chr_attw.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/atac2gex/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/atac2gex/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,7 +20,6 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="Jupyter Notebook" />
       </list>
     </option>
@@ -27,7 +30,7 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2Ng3zclS73JHPFQg2ki6PlciNdB" />
+  <component name="ProjectId" id="2PIKZp6sBuxgwPyOPEBOW8ijPgf" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -37,91 +40,17 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;H:/PycharmProjects/Single-Cell/att_w/plot&quot;,
+    &quot;last_opened_file_path&quot;: &quot;H:/PycharmProjects/Single-Cell&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;PyScientificConfigurable&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="H:\PycharmProjects\Single-Cell\craw" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="H:\PycharmProjects\Single-Cell" />
-    </key>
-  </component>
-  <component name="RunManager" selected="Python.plot">
-    <configuration name="plot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Single-Cell" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/att_w" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/att_w/plot.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="processed" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Single-Cell" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/cajal/train" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cajal/train/processed.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="ranking" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Single-Cell" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/att_w" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/att_w/ranking.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="test_23chr (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager">
+    <configuration name="test_23chr_attw" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Single-Cell" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -134,29 +63,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/atac2gex/test_23chr.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="test_23chr_att_w" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Single-Cell" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/atac2gex" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/atac2gex/test_23chr_att_w.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/atac2gex/test_23chr_attw.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -167,94 +74,47 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.plot" />
-        <item itemvalue="Python.test_23chr_att_w" />
-        <item itemvalue="Python.ranking" />
-        <item itemvalue="Python.test_23chr (1)" />
-        <item itemvalue="Python.processed" />
+        <item itemvalue="Python.test_23chr_attw" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="40f557ff-e0a7-426c-b010-d5713a926c59" name="Changes" comment="" />
-      <created>1680072161493</created>
+      <changelist id="7924fa5e-46c7-42ed-86cb-454985fb8b81" name="Changes" comment="" />
+      <created>1683139216303</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1680072161493</updated>
-      <workItem from="1680072162676" duration="15038000" />
-      <workItem from="1680096505305" duration="1765000" />
-      <workItem from="1680099030436" duration="2000" />
-      <workItem from="1681116574023" duration="1221000" />
-      <workItem from="1681207931384" duration="1709000" />
-      <workItem from="1681217650558" duration="2586000" />
-      <workItem from="1681234436823" duration="12743000" />
-      <workItem from="1681283383206" duration="135000" />
-      <workItem from="1681283532644" duration="9355000" />
-      <workItem from="1681990430260" duration="400000" />
-      <workItem from="1682039683165" duration="2042000" />
-      <workItem from="1682042536837" duration="1199000" />
-      <workItem from="1682066670799" duration="4470000" />
-      <workItem from="1682127250245" duration="1651000" />
-      <workItem from="1682142540382" duration="2000" />
-      <workItem from="1682159501655" duration="941000" />
-      <workItem from="1682211757226" duration="634000" />
-      <workItem from="1682246501840" duration="4938000" />
-      <workItem from="1682266656526" duration="3000" />
-      <workItem from="1682298084623" duration="4978000" />
-      <workItem from="1682328460967" duration="6996000" />
-      <workItem from="1682342348583" duration="2000" />
-      <workItem from="1682412292657" duration="455000" />
-      <workItem from="1682508170767" duration="703000" />
-      <workItem from="1682608494442" duration="1000" />
-      <workItem from="1682676584538" duration="4859000" />
-      <workItem from="1682694852145" duration="6638000" />
-      <workItem from="1682731466424" duration="2136000" />
-      <workItem from="1682759890519" duration="3876000" />
-      <workItem from="1682785400565" duration="2265000" />
-      <workItem from="1682817913930" duration="7988000" />
-      <workItem from="1682851750833" duration="3376000" />
-      <workItem from="1682856541530" duration="233000" />
-      <workItem from="1682867291878" duration="10142000" />
-      <workItem from="1683135898526" duration="2628000" />
-      <workItem from="1683138582280" duration="566000" />
+      <updated>1683139216303</updated>
+      <workItem from="1683139216842" duration="543000" />
+      <workItem from="1683862080083" duration="3000" />
+      <workItem from="1683921994440" duration="2000" />
+      <workItem from="1685028741109" duration="46000" />
+      <workItem from="1685888762809" duration="6000" />
+      <workItem from="1688090370774" duration="476000" />
+      <workItem from="1688519070721" duration="625000" />
+      <workItem from="1688634627598" duration="4317000" />
+      <workItem from="1688644911261" duration="393000" />
+      <workItem from="1688654092190" duration="4358000" />
+      <workItem from="1688691544501" duration="1204000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
-          <url>notebook://H:/PycharmProjects/Single-Cell/att_w/att_w.ipynb</url>
-          <line>162</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
-          <url>notebook://H:/PycharmProjects/Single-Cell/att_w/check_chr.ipynb</url>
-          <line>67</line>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/fine_tune/test_23chr.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Single_Cell$plot2.coverage" NAME="plot2 Coverage Results" MODIFIED="1680083798284" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/att_w" />
-    <SUITE FILE_PATH="coverage/Single_Cell$test_23chr_att_w.coverage" NAME="test_23chr_att_w Coverage Results" MODIFIED="1682822168700" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/atac2gex" />
-    <SUITE FILE_PATH="coverage/Single_Cell$processed.coverage" NAME="processed Coverage Results" MODIFIED="1682076231336" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cajal/train" />
-    <SUITE FILE_PATH="coverage/Single_Cell$test_23chr__1_.coverage" NAME="test_23chr (1) Coverage Results" MODIFIED="1682302948682" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/atac2gex" />
-    <SUITE FILE_PATH="coverage/Single_Cell$train_23chr.coverage" NAME="train_23chr Coverage Results" MODIFIED="1682067507756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/atac2gex" />
-    <SUITE FILE_PATH="coverage/Single_Cell$ranking.coverage" NAME="ranking Coverage Results" MODIFIED="1682820311269" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/att_w" />
-    <SUITE FILE_PATH="coverage/Single_Cell$plot_3.coverage" NAME="plot 3 Coverage Results" MODIFIED="1681292819426" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/att_w" />
-    <SUITE FILE_PATH="coverage/Single_Cell$plot.coverage" NAME="plot Coverage Results" MODIFIED="1682823314367" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/att_w" />
-    <SUITE FILE_PATH="coverage/Single_Cell$test_23chr.coverage" NAME="test_23chr Coverage Results" MODIFIED="1681241298808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fine_tune" />
+    <SUITE FILE_PATH="coverage/Single_Cell$test_23chr_attw.coverage" NAME="test_23chr_attw Coverage Results" MODIFIED="1688659397216" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/atac2gex" />
   </component>
 </project>

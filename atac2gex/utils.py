@@ -143,6 +143,26 @@ class ModalityDataset(Dataset):
         return mod1, mod2_pred, mod2
 
 
+class ModalityDataset3(Dataset):
+    def __init__(self, mod1, mod2_pred, mod2, cell_types):
+        self.mod1 = mod1
+        self.mod2_pred = mod2_pred
+        self.mod2 = mod2
+        self.cell_types = cell_types
+
+    def __len__(self):
+        return self.mod1.shape[0]
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        mod1 = torch.tensor(self.mod1[idx]).float()
+        mod2_pred = torch.tensor(self.mod2_pred[idx]).float()
+        mod2 = torch.tensor(self.mod2[idx]).float()
+        cell_type = self.cell_types[idx]
+        return mod1, mod2_pred, mod2, cell_type
+
 class ModalityNET(torch.nn.Module):
     def __init__(self, out_dims):
         super().__init__()
