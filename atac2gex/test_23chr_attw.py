@@ -1,6 +1,7 @@
 import pickle as pk
 import os
 import numpy as np
+import pandas as pd
 import scanpy as sc
 import torch
 from scipy.sparse import csr_matrix
@@ -139,6 +140,8 @@ for chr in range(1, 23):
 
     for key in att_w_dict.keys():
         att_w_dict[key] /= att_w_count[key]
+        att_w_dict[key] = pd.DataFrame(att_w_dict[key].T, mod1.var_names, mod2.var_names)
+
 
     pk.dump(att_w_dict, open(f'../data/att w/chr{chr}_mean_att_w_per_cell_group.pkl', 'wb'))
 
