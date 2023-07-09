@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7924fa5e-46c7-42ed-86cb-454985fb8b81" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/atac2gex/test_23chr_attw.py" beforeDir="false" afterPath="$PROJECT_DIR$/atac2gex/test_23chr_attw.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/att_w/analysis.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/att_w/analysis.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/att_w/gene_maker_analysis.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/att_w/gene_maker_analysis.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,7 +92,10 @@
       <workItem from="1688634627598" duration="4317000" />
       <workItem from="1688644911261" duration="393000" />
       <workItem from="1688654092190" duration="4358000" />
-      <workItem from="1688691544501" duration="4078000" />
+      <workItem from="1688691544501" duration="4153000" />
+      <workItem from="1688715964415" duration="3897000" />
+      <workItem from="1688749400488" duration="1700000" />
+      <workItem from="1688889123927" duration="6152000" />
     </task>
     <servers />
   </component>
