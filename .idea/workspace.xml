@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7924fa5e-46c7-42ed-86cb-454985fb8b81" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/att_w/find_pathways.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/att_w/Docx.docx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/att_w/analysis.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/att_w/analysis.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -45,6 +47,12 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="H:\PycharmProjects\Single-Cell\data\html\t cell" />
+      <recent name="H:\PycharmProjects\Single-Cell\data\html" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="test_23chr_attw" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Single-Cell" />
@@ -96,6 +104,16 @@
       <workItem from="1688715964415" duration="3897000" />
       <workItem from="1688749400488" duration="1700000" />
       <workItem from="1688889123927" duration="6152000" />
+      <workItem from="1688912038936" duration="279000" />
+      <workItem from="1688975839969" duration="624000" />
+      <workItem from="1689070252005" duration="654000" />
+      <workItem from="1689128720083" duration="2801000" />
+      <workItem from="1689154878602" duration="3677000" />
+      <workItem from="1689174008368" duration="2300000" />
+      <workItem from="1689178882711" duration="1854000" />
+      <workItem from="1689211139680" duration="4409000" />
+      <workItem from="1689240607483" duration="17889000" />
+      <workItem from="1689268209209" duration="36000" />
     </task>
     <servers />
   </component>
@@ -114,6 +132,6 @@
     </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Single_Cell$test_23chr_attw.coverage" NAME="test_23chr_attw Coverage Results" MODIFIED="1688702037022" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/atac2gex" />
+    <SUITE FILE_PATH="coverage/Single_Cell$test_23chr_attw.coverage" NAME="test_23chr_attw Coverage Results" MODIFIED="1689157220775" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/atac2gex" />
   </component>
 </project>
